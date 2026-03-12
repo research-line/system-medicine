@@ -1,0 +1,27 @@
+__pycache__/
+*.pyc
+data/system_medizin.db
+data/cache/
+data/manifest.json
+*.egg-info/
+.venv/
+TEXTBUNDLE_prototype.txt
+
+# LaTeX artifacts
+paper/*.aux
+paper/*.bbl
+paper/*.blg
+paper/*.log
+paper/*.out
+paper/*.toc
+paper/*.fls
+paper/*.fdb_latexmk
+paper/*.synctex.gz
+
+# Internal planning documents
+Plan.txt
+KONZEPT.md
+AKTIONSPLAN.md
+REVISE.txt
+SOLVED*.txt
+_archive/
