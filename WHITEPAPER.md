@@ -5,16 +5,16 @@
 
 **Author:** Lukas Geiger, Independent Researcher, Bernau, Germany
 **Date:** March 2026
-**Status:** DRAFT -- Concept Paper v0.2
-**Prototype:** Available at [github.com/lukisch/system-medicine](https://github.com/lukisch/system-medicine)
+**Status:** DRAFT -- Concept Paper v0.3
+**Prototype:** Available at [github.com/research-line/system-medicine](https://github.com/research-line/system-medicine)
 
 ---
 
 ## Abstract
 
-We present the design and prototype implementation of a functional pathway-centric medical knowledge graph intended to support differential diagnosis. Standard clinical decision support systems organize knowledge around diagnoses, symptoms, or genes as primary entities. In contrast, the proposed system uses *biological functional pathways* as its central organizing principle, linking genes, proteins, laboratory values, anatomical locations, cell types, and clinical diagnoses as secondary annotations. This architecture enables a novel form of *exclusion reasoning*: if a functional pathway is demonstrated to be intact (via normal laboratory markers and absence of relevant symptoms), all genes essential and sufficient for that pathway can be excluded as primary causes of disease in the current patient. The system is implemented as a SQLite-backed prototype with a graphical interface, integrating public data sources (Reactome, Gene Ontology, UniProt, HGNC, Uberon, Cell Ontology). We describe the formal exclusion model, its assumptions and limitations, and propose a validation framework. The system is positioned as a research tool for exploring the pathway-centric paradigm, not as a clinical decision support system.
+We present the design and prototype implementation of a functional pathway-centric medical knowledge graph intended to support differential diagnosis. Standard clinical decision support systems organize knowledge around diagnoses, symptoms, or genes as primary entities. In contrast, the proposed system uses *biological functional pathways* as its central organizing principle, linking genes, proteins, laboratory values, anatomical locations, cell types, and clinical diagnoses as secondary annotations. This architecture enables a novel form of *exclusion reasoning*: if a functional pathway is demonstrated to be intact (via normal laboratory markers and absence of relevant symptoms), all genes essential and sufficient for that pathway can be excluded as primary causes of disease in the current patient. The system is implemented as a SQLite-backed prototype with a graphical interface, integrating public data sources (Reactome, Gene Ontology, UniProt, HGNC, Uberon, Cell Ontology). The current prototype covers 36 functional pathways, 111 laboratory parameters, 50 genes, 41 clinical diagnoses, and 26 measurement signatures spanning hematology, hepatology, nephrology, endocrinology, immunology, cardiology, oncology markers, blood gas analysis, rheumatology, and pulmonology. We describe the formal exclusion model, its assumptions and limitations, and propose a validation framework. The system is positioned as a research tool for exploring the pathway-centric paradigm, not as a clinical decision support system.
 
-**Keywords:** knowledge graph, differential diagnosis, functional pathways, exclusion reasoning, system medicine, Reactome, Gene Ontology
+**Keywords:** knowledge graph, differential diagnosis, functional pathways, exclusion reasoning, system medicine, Reactome, Gene Ontology, biomarker
 
 ---
 
@@ -92,6 +92,22 @@ The prototype uses **SQLite** as the backend, with relational tables simulating 
 | Cell Ontology | Cell types | Integrated |
 | KEGG | Pathway maps | Planned |
 | OMIM / HPO | Disease-gene associations | Planned |
+
+### 3.4 Data Coverage (v0.3)
+
+The prototype includes curated seed data spanning multiple medical domains:
+
+| Category | Count | Examples |
+|----------|-------|---------|
+| Functional pathways | 36 | Complement cascade, HPA axis, heme biosynthesis, RAAS, DNA repair, apoptosis regulation |
+| Laboratory parameters | 111 | Complete blood count, liver/kidney panels, coagulation, lipids, thyroid, iron, tumor markers, blood gas, hormones, complement, autoimmune markers |
+| Genes/proteins | 50 | Structural (ANK1, VWF), signaling (CD4, ZAP70, STAT1), metabolic (CYP11A1, ALAS2), regulatory (TP53, BRCA1) |
+| Clinical diagnoses | 41 | Rare (porphyria, hemophilia), common (diabetes, CKD), autoimmune (SLE, RA), oncological (CRC, HCC) |
+| Measurement signatures | 26 | Hemolysis, sepsis, Cushing, Addison, lupus, metabolic syndrome, respiratory acidosis |
+| Body locations | 22 | Including adrenal, hypothalamus, pituitary, alveoli, thymus, synovium |
+| Cell types | 21 | Including T-lymphocytes, NK cells, osteoblasts, alveolar type II cells, dendritic cells |
+
+The data model supports 7 edge types with 125 measurement-pathway links, 52 gene-pathway links (with essentiality flags), and 54 pathway-diagnosis associations.
 
 ---
 
@@ -192,14 +208,16 @@ The system should be benchmarked against at least one existing tool (Phenomizer 
 
 ## 8. Conclusion
 
-The functional pathway-centric knowledge graph represents a structurally distinct approach to differential diagnosis support, exploiting pathway-status evidence as explicit diagnostic constraints. The prototype implementation demonstrates feasibility across all core components: data ingestion, graph modeling, exclusion reasoning, and visualization. The core hypothesis—that pathway exclusion reduces the candidate gene space by ≥ 30% without false exclusions—is testable and constitutes the primary empirical target for future work.
+The functional pathway-centric knowledge graph represents a structurally distinct approach to differential diagnosis support, exploiting pathway-status evidence as explicit diagnostic constraints. The prototype implementation demonstrates feasibility across all core components: data ingestion, graph modeling, exclusion reasoning, and visualization, now spanning 36 pathways across 10 medical domains with 111 laboratory parameters, 50 genes, 41 diagnoses, and 26 diagnostic signatures. The core hypothesis—that pathway exclusion reduces the candidate gene space by ≥ 30% without false exclusions—is testable and constitutes the primary empirical target for future work.
 
 Key open tasks before academic publication:
-1. Curated benchmark dataset (20–50 cases)
-2. Data-driven calibration of pathway weights $w_i$
-3. Integration of OMIM/HPO disease-gene associations
+1. Curated benchmark dataset (20–50 cases from rare disease registries)
+2. Data-driven calibration of pathway weights $w_i$ via grid search on training cases
+3. Integration of OMIM/HPO disease-gene associations for comprehensive gene coverage
 4. Benchmarking against Phenomizer on the same case set
-5. Performance evaluation of SQLite vs. Neo4j backends
+5. Performance evaluation of SQLite vs. Neo4j backends at full Reactome scale
+6. Sensitivity analysis: robustness of CRR under parameter variation ($w_i \pm 0.2$)
+7. Explicit failure mode documentation (pleiotropy, measurement masking, tissue-specific essentiality)
 
 ---
 

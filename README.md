@@ -8,8 +8,22 @@ System-Medizin modelliert den menschlichen Koerper als Netzwerk von **Funktionsp
 
 - **Ausschlusslogik:** Intakte Pfade beweisen, dass ihre essenziellen Gene funktionieren -- diese Gene koennen als Ursache ausgeschlossen werden.
 - **Probabilistische Analyse:** Konfidenzwerte fuer Gen-Ausschluss basierend auf Pfad-Evidenz, Redundanz und Multi-Pfad-Staerkung.
-- **Pattern-Detection:** Automatische Erkennung bekannter Messwert-Signaturen (z.B. Haemolyse-Muster).
+- **Pattern-Detection:** Automatische Erkennung bekannter Messwert-Signaturen (z.B. Haemolyse, Lupus, Sepsis, Cushing).
 - **Diagnose-Queries:** Von auffaelligen Messwerten ueber Verdachtspfade zu Kandidatengenen und empfohlenen Zusatztests.
+
+## Datenabdeckung (v0.3)
+
+| Kategorie | Anzahl |
+|-----------|--------|
+| Funktionspfade | 36 |
+| Laborparameter | 111 |
+| Gene/Proteine | 50 |
+| Diagnosen | 41 |
+| Messwert-Signaturen | 26 |
+| Koerperorte | 22 |
+| Zelltypen | 21 |
+
+Abgedeckte Fachbereiche: Haematologie, Hepatologie, Nephrologie, Endokrinologie (Schilddruese, HPA-Achse, Gonaden, PTH), Immunologie (Komplement, T-Zellen, NK-Zellen), Kardiologie, Onkologie-Marker, Blutgasanalyse, Rheumatologie, Haemostase, Pneumologie, Gastroenterologie.
 
 ## Installation
 
@@ -25,7 +39,7 @@ python main.py
 
 Oder unter Windows: `START.bat` doppelklicken.
 
-Beim ersten Start erscheint ein Setup-Wizard. Ueber "Demo-Daten laden" wird ein Haemolyse-Szenario mit Beispieldaten angelegt.
+Beim ersten Start erscheint ein Setup-Wizard. Ueber "Demo-Daten laden" werden alle Datenpanels angelegt (Haemolyse, klinische Laborpanels, erweiterte Systeme).
 
 ## Architektur
 
