@@ -1,6 +1,6 @@
 """Ausschlusslogik: Intakte Pfade schliessen essenzielle Gene aus.
 
-Kernprinzip: 
+Kernprinzip:
 - Ein intakter Pfad beweist, dass alle seine essenziellen Gene funktionieren.
 - Wenn ein Gen NUR in intakten Pfaden essentiell ist, kann es nicht die Ursache sein.
 - Gene die auch in gestoerten/unbekannten Pfaden essentiell sind, bleiben Kandidaten.
@@ -8,6 +8,7 @@ Kernprinzip:
   ihre Pfade intakt sind.
 """
 import sqlite3
+from collections import defaultdict
 from typing import List, Dict, Set, Tuple, Optional
 
 
@@ -45,9 +46,33 @@ class ExclusionEngine:
         """, (gene_id,)).fetchall()
         return [dict(r) for r in rows]
     
+    def _load_all_gene_pathway_mappings(self) -> Dict[int, List[dict]]:
+        """Laedt ALLE Gen-Pathway-Mappings in einer einzigen Query.
+
+        Vermeidet N+1 Queries (eine pro Gen) in run_exclusion().
+        Returns: Dict gene_id -> Liste von Pathway-Dicts
+        """
+        rows = self.conn.execute("""
+            SELECT gp.id as gene_id, gp.symbol, gp.name, gp.function_type, gp.redundancy_degree,
+                   fp.id as pathway_id, fp.name as pathway_name, fp.status
+            FROM genes_proteins gp
+            JOIN gene_pathways gpw ON gp.id = gpw.gene_id
+            JOIN functional_pathways fp ON fp.id = gpw.pathway_id
+            WHERE gpw.is_essential = 1
+        """).fetchall()
+
+        mapping = defaultdict(list)
+        for r in rows:
+            mapping[r["gene_id"]].append({
+                "id": r["pathway_id"],
+                "name": r["pathway_name"],
+                "status": r["status"],
+            })
+        return mapping
+
     def run_exclusion(self) -> dict:
         """Fuehrt die Ausschlussanalyse durch.
-        
+
         Returns:
             dict mit:
             - excluded_genes: Liste von Genen die ausgeschlossen werden koennen
@@ -59,7 +84,7 @@ class ExclusionEngine:
         pathways = self.get_pathway_status()
         intact_ids = {pid for pid, p in pathways.items() if p["status"] == "intakt"}
         disturbed_ids = {pid for pid, p in pathways.items() if p["status"] == "gestoert"}
-        
+
         # Alle Gene sammeln die in mindestens einem Pfad essentiell sind
         all_essential_genes = self.conn.execute("""
             SELECT DISTINCT gp.id, gp.symbol, gp.name, gp.function_type, gp.redundancy_degree
@@ -67,28 +92,31 @@ class ExclusionEngine:
             JOIN gene_pathways gpw ON gp.id = gpw.gene_id
             WHERE gpw.is_essential = 1
         """).fetchall()
-        
+
+        # Alle Gen-Pathway-Mappings in EINER Query laden (statt N+1)
+        gene_pathway_map = self._load_all_gene_pathway_mappings()
+
         excluded = []
         candidates = []
         reasoning = []
-        
+
         for gene_row in all_essential_genes:
             gene = dict(gene_row)
             gene_id = gene["id"]
-            
-            # Alle Pfade in denen dieses Gen essentiell ist
-            gene_pathways = self.get_all_pathways_for_gene(gene_id)
+
+            # Alle Pfade in denen dieses Gen essentiell ist (aus Bulk-Lookup)
+            gene_pathways = gene_pathway_map.get(gene_id, [])
             pathway_ids = {p["id"] for p in gene_pathways}
-            
+
             # Pruefen: Sind ALLE Pfade dieses Gens intakt?
             all_intact = pathway_ids.issubset(intact_ids)
             # Hat das Gen mindestens einen gestoerten Pfad?
             has_disturbed = bool(pathway_ids & disturbed_ids)
             # Nicht-intakte Pfade
             non_intact = pathway_ids - intact_ids
-            
+
             pathway_names = {p["id"]: p["name"] for p in gene_pathways}
-            
+
             if all_intact and len(intact_ids & pathway_ids) > 0:
                 excluded.append(gene)
                 intact_names = [pathway_names[pid] for pid in pathway_ids & intact_ids]
@@ -113,7 +141,7 @@ class ExclusionEngine:
                     "reason": "; ".join(reason_parts) or "Kein Pfad als intakt markiert",
                     "confidence": "hoch" if has_disturbed else "niedrig",
                 })
-        
+
         return {
             "excluded_genes": excluded,
             "candidate_genes": candidates,
@@ -171,14 +199,14 @@ class ProbabilisticExclusionEngine(ExclusionEngine):
     
     def run_probabilistic_exclusion(self) -> dict:
         """Fuehrt probabilistische Ausschlussanalyse durch.
-        
+
         Returns:
             dict mit:
             - gene_scores: Liste von {gene, exclusion_confidence, factors}
             - summary: Zusammenfassung
         """
         pathways = self.get_pathway_status()
-        
+
         # Alle essenziellen Gene
         all_essential_genes = self.conn.execute("""
             SELECT DISTINCT gp.id, gp.symbol, gp.name, gp.function_type, gp.redundancy_degree
@@ -186,15 +214,18 @@ class ProbabilisticExclusionEngine(ExclusionEngine):
             JOIN gene_pathways gpw ON gp.id = gpw.gene_id
             WHERE gpw.is_essential = 1
         """).fetchall()
-        
+
+        # Alle Gen-Pathway-Mappings in EINER Query laden (statt N+1)
+        gene_pathway_map = self._load_all_gene_pathway_mappings()
+
         gene_scores = []
-        
+
         for gene_row in all_essential_genes:
             gene = dict(gene_row)
             gene_id = gene["id"]
-            
-            # Alle Pfade in denen das Gen essentiell ist
-            gene_pathways = self.get_all_pathways_for_gene(gene_id)
+
+            # Alle Pfade in denen das Gen essentiell ist (aus Bulk-Lookup)
+            gene_pathways = gene_pathway_map.get(gene_id, [])
             
             if not gene_pathways:
                 continue

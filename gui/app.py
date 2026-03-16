@@ -35,7 +35,12 @@ class MainWindow(QMainWindow):
         count = self.conn.execute("SELECT COUNT(*) FROM functional_pathways").fetchone()[0]
         if count == 0:
             self._show_setup_wizard()
-        
+            # Connection-Refresh: Worker im Wizard nutzt eigene Connection,
+            # daher muss die Main-Connection neu geoeffnet werden um
+            # die Worker-Aenderungen zu sehen.
+            self.conn.close()
+            self.conn = get_connection(DB_PATH)
+
         self._setup_ui()
         self._setup_statusbar()
     

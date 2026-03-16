@@ -89,7 +89,7 @@ The central observation motivating this work is:
 
 This transforms positive evidence (intact pathway) into negative diagnostic constraints (excluded genes), potentially reducing the candidate space substantially before differential diagnosis is applied.
 
-Existing systems organize knowledge differently. PhenoTips \citep{Girdea2013} and Phenomizer \citep{Kohler2009} match patient phenotypes to disease databases via the Human Phenotype Ontology \citep{Robinson2008}. These systems excel at symptom-to-disease matching but do not exploit pathway integrity as exclusion evidence. Pathway databases such as Reactome \citep{Fabregat2018} and KEGG organize around biochemical reactions but are not designed for clinical exclusion reasoning. Gene Ontology \citep{Ashburner2000} provides fine-grained process descriptions but lacks the clinical decision framework.
+Existing systems organize knowledge differently. PhenoTips \citep{Girdea2013} and Phenomizer \citep{Kohler2009} match patient phenotypes to disease databases via the Human Phenotype Ontology \citep{Robinson2008}. These systems excel at symptom-to-disease matching but do not exploit pathway integrity as exclusion evidence. Pathway databases such as Reactome \citep{Fabregat2018} and KEGG \citep{Kanehisa2023} organize around biochemical reactions but are not designed for clinical exclusion reasoning. Gene Ontology \citep{Ashburner2000} provides fine-grained process descriptions but lacks the clinical decision framework.
 
 The proposed system bridges this gap by treating functional pathways as \emph{first-class entities} in a knowledge graph, with all other biomedical concepts---genes, anatomical locations, cell types, laboratory markers, and diagnoses---attached as secondary annotations. This structural choice enables a formal exclusion logic that is both computationally tractable and biologically meaningful.
 
@@ -145,6 +145,7 @@ This is a specific, falsifiable hypothesis. The 30\% threshold is set as a minim
 
 The candidate reduction rate (CRR) is defined as:
 \begin{equation}
+\label{eq:crr}
     \text{CRR} = 1 - \frac{|\mathcal{G}_{\text{after exclusion}}|}{|\mathcal{G}_{\text{before exclusion}}|}
 \end{equation}
 
@@ -174,6 +175,8 @@ The central entity is the \textbf{FunctionalPathway} node, representing a discre
     \node[entity, fill=red!20, below left=2cm and 3cm of pathway] (gene) {Gene /\\Protein};
     \node[entity, fill=purple!20, below right=2cm and 3cm of pathway] (measurement) {Measurement\\Type};
     \node[entity, fill=yellow!30, below=3cm of pathway] (diagnosis) {Clinical\\Diagnosis};
+    \node[entity, fill=purple!10, right=2cm of measurement] (signature) {Measurement\\Signature};
+    \node[entity, fill=teal!20, above=3.5cm of pathway] (datasource) {Data\\Source};
 
     % Edges
     \draw[->, thick] (pathway) -- node[edge_label, above, sloped] {OCCURS\_IN} (location);
@@ -181,6 +184,8 @@ The central entity is the \textbf{FunctionalPathway} node, representing a discre
     \draw[->, thick] (gene) -- node[edge_label, above, sloped] {REQUIRES / MODULATES} (pathway);
     \draw[->, thick] (measurement) -- node[edge_label, above, sloped] {MONITORED\_BY} (pathway);
     \draw[->, thick] (pathway) -- node[edge_label, right] {IMPAIRED\_IN} (diagnosis);
+    \draw[->, thick] (signature) -- node[edge_label, above] {COMPOSED\_OF} (measurement);
+    \draw[->, dashed] (datasource) -- node[edge_label, right, pos=0.3] {PROVIDES} (pathway);
 
     % Cross-edges
     \draw[->, dashed] (gene) -- node[edge_label, left] {EXPRESSED\_IN} (location);
@@ -293,7 +298,8 @@ UniProt \citep{UniProt2023} & Proteins, gene links & TSV & Integrated \\
 HGNC \citep{Braschi2019} & Gene nomenclature & TSV & Integrated \\
 Uberon \citep{Mungall2012} & Anatomical locations & OBO & Integrated \\
 Cell Ontology \citep{Diehl2016} & Cell types & OBO & Integrated \\
-OMIM / HPO \citep{Robinson2008} & Disease--gene links & --- & Planned \\
+KEGG \citep{Kanehisa2023} & Pathway maps & REST API & Planned \\
+OMIM \citep{Amberger2019} / HPO \citep{Robinson2008} & Disease--gene links & --- & Planned \\
 \bottomrule
 \end{tabular}
 \end{table}
@@ -462,7 +468,7 @@ Not all pathways have adequate Reactome coverage. Orphan pathways, tissue-specif
 
 \subsection{EHR Interoperability}
 
-A practical deployment of exclusion-based clinical decision support requires integration with electronic health record (EHR) systems to obtain structured patient laboratory data. Without interoperable access to real-time laboratory values via standards such as HL7 FHIR, the system remains limited to manually entered measurements. EHR interoperability is a well-documented challenge in clinical informatics; addressing it is beyond the scope of this concept paper but constitutes a critical requirement for any future clinical application.
+A practical deployment of exclusion-based clinical decision support requires integration with electronic health record (EHR) systems to obtain structured patient laboratory data. Without interoperable access to real-time laboratory values via standards such as HL7 FHIR \citep{HL7FHIR2023}, the system remains limited to manually entered measurements. EHR interoperability is a well-documented challenge in clinical informatics; addressing it is beyond the scope of this concept paper but constitutes a critical requirement for any future clinical application.
 
 \subsection{Measurement Redundancy and Contextuality}
 
@@ -529,7 +535,7 @@ Target sources include rare disease registries (EURORDIS), OMIM clinical synopsi
 
 \subsection{Primary Metric}
 
-The candidate reduction rate (CRR, Equation~5) serves as the primary success criterion. A CRR $> 0.30$ supports the core hypothesis; a CRR $< 0.10$ would indicate insufficient diagnostic value.
+The candidate reduction rate (CRR, Equation~\eqref{eq:crr}) serves as the primary success criterion. A CRR $> 0.30$ supports the core hypothesis; a CRR $< 0.10$ would indicate insufficient diagnostic value.
 
 \textbf{Safety constraint}: The confirmed causal gene must \emph{never} be excluded (false exclusion rate = 0). Any false exclusion in the benchmark invalidates the model for clinical application.
 

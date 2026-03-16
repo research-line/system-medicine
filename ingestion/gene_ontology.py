@@ -36,8 +36,8 @@ def import_go_terms(conn, filepath: str) -> int:
         if count % 2000 == 0:
             conn.commit()
     
-    conn.commit()
     insert_data_source(conn, "gene_ontology", filepath, "", "", count)
+    conn.commit()
     return count
 
 
@@ -90,6 +90,12 @@ def import_go_annotations(conn, filepath: str) -> int:
             if not pathway_id:
                 continue
             
+            # is_essential bleibt auf DEFAULT 0 (nicht explizit gesetzt).
+            # Das ist korrekt: GO-Annotationen zeigen Gen-Pathway-Beteiligung,
+            # nicht Essentialitaet. Essentialitaet wird durch separate
+            # Datenquellen oder manuelle Kuration bestimmt. Die
+            # Ausschlusslogik (ExclusionEngine) filtert nach is_essential=1,
+            # daher werden reine GO-Annotationen dort nicht beruecksichtigt.
             batch.append((gene_id, pathway_id, "annotiert"))
             count += 1
             
@@ -108,6 +114,6 @@ def import_go_annotations(conn, filepath: str) -> int:
             "(gene_id, pathway_id, relation) VALUES (?, ?, ?)",
             batch
         )
-    conn.commit()
     insert_data_source(conn, "go_annotations", filepath, "", "", count)
+    conn.commit()
     return count

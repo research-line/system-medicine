@@ -89,7 +89,7 @@ Die zentrale Beobachtung, die diese Arbeit motiviert, lautet:
 
 Dies transformiert positive Evidenz (intakter Pathway) in negative diagnostische Einschraenkungen (ausgeschlossene Gene) und kann den Kandidatenraum erheblich reduzieren, bevor die Differentialdiagnose angewendet wird.
 
-Bestehende Systeme organisieren Wissen unterschiedlich. PhenoTips \citep{Girdea2013} und Phenomizer \citep{Kohler2009} gleichen Patientenphaenotypen ueber die Human Phenotype Ontology \citep{Robinson2008} mit Krankheitsdatenbanken ab. Diese Systeme sind hervorragend im Symptom-Krankheits-Abgleich, nutzen aber nicht die Pathway-Integritaet als Ausschlussbeleg. Pathway-Datenbanken wie Reactome \citep{Fabregat2018} und KEGG organisieren sich um biochemische Reaktionen, sind aber nicht fuer klinisches Ausschlussschliessen konzipiert. Gene Ontology \citep{Ashburner2000} liefert feingranulare Prozessbeschreibungen, es fehlt jedoch der klinische Entscheidungsrahmen.
+Bestehende Systeme organisieren Wissen unterschiedlich. PhenoTips \citep{Girdea2013} und Phenomizer \citep{Kohler2009} gleichen Patientenphaenotypen ueber die Human Phenotype Ontology \citep{Robinson2008} mit Krankheitsdatenbanken ab. Diese Systeme sind hervorragend im Symptom-Krankheits-Abgleich, nutzen aber nicht die Pathway-Integritaet als Ausschlussbeleg. Pathway-Datenbanken wie Reactome \citep{Fabregat2018} und KEGG \citep{Kanehisa2023} organisieren sich um biochemische Reaktionen, sind aber nicht fuer klinisches Ausschlussschliessen konzipiert. Gene Ontology \citep{Ashburner2000} liefert feingranulare Prozessbeschreibungen, es fehlt jedoch der klinische Entscheidungsrahmen.
 
 Das vorgeschlagene System schliesst diese Luecke, indem es funktionelle Pathways als \emph{erstrangige Entitaeten} in einem Wissensgraphen behandelt, wobei alle anderen biomedizinischen Konzepte -- Gene, anatomische Lokalisationen, Zelltypen, Labormarker und Diagnosen -- als sekundaere Annotationen angebunden werden. Diese strukturelle Entscheidung ermoeglicht eine formale Ausschlusslogik, die sowohl rechnerisch handhabbar als auch biologisch sinnvoll ist.
 
@@ -145,6 +145,7 @@ Dies ist eine spezifische, falsifizierbare Hypothese. Die 30\,\%-Schwelle ist al
 
 Die Kandidatenreduktionsrate (CRR) ist definiert als:
 \begin{equation}
+\label{eq:crr}
     \text{CRR} = 1 - \frac{|\mathcal{G}_{\text{after exclusion}}|}{|\mathcal{G}_{\text{before exclusion}}|}
 \end{equation}
 
@@ -166,14 +167,16 @@ Die zentrale Entitaet ist der \textbf{FunctionalPathway}-Knoten, der einen diskr
     node distance=2.5cm and 3cm
 ]
     % Central node
-    \node[entity, fill=blue!20] (pathway) {Functional\\Pathway};
+    \node[entity, fill=blue!20] (pathway) {Funktions-\\pfad};
 
     % Surrounding nodes
-    \node[entity, fill=green!20, above left=2cm and 3cm of pathway] (location) {Body\\Location};
-    \node[entity, fill=orange!20, above right=2cm and 3cm of pathway] (cell) {Cell\\Type};
-    \node[entity, fill=red!20, below left=2cm and 3cm of pathway] (gene) {Gene /\\Protein};
-    \node[entity, fill=purple!20, below right=2cm and 3cm of pathway] (measurement) {Measurement\\Type};
-    \node[entity, fill=yellow!30, below=3cm of pathway] (diagnosis) {Clinical\\Diagnosis};
+    \node[entity, fill=green!20, above left=2cm and 3cm of pathway] (location) {K\"orper-\\ort};
+    \node[entity, fill=orange!20, above right=2cm and 3cm of pathway] (cell) {Zelltyp};
+    \node[entity, fill=red!20, below left=2cm and 3cm of pathway] (gene) {Gen /\\Protein};
+    \node[entity, fill=purple!20, below right=2cm and 3cm of pathway] (measurement) {Messwert};
+    \node[entity, fill=yellow!30, below=3cm of pathway] (diagnosis) {Diagnose};
+    \node[entity, fill=purple!10, right=2cm of measurement] (signature) {Messwert-\\Signatur};
+    \node[entity, fill=teal!20, above=3.5cm of pathway] (datasource) {Daten-\\quelle};
 
     % Edges
     \draw[->, thick] (pathway) -- node[edge_label, above, sloped] {OCCURS\_IN} (location);
@@ -181,6 +184,8 @@ Die zentrale Entitaet ist der \textbf{FunctionalPathway}-Knoten, der einen diskr
     \draw[->, thick] (gene) -- node[edge_label, above, sloped] {REQUIRES / MODULATES} (pathway);
     \draw[->, thick] (measurement) -- node[edge_label, above, sloped] {MONITORED\_BY} (pathway);
     \draw[->, thick] (pathway) -- node[edge_label, right] {IMPAIRED\_IN} (diagnosis);
+    \draw[->, thick] (signature) -- node[edge_label, above] {COMPOSED\_OF} (measurement);
+    \draw[->, dashed] (datasource) -- node[edge_label, right, pos=0.3] {PROVIDES} (pathway);
 
     % Cross-edges
     \draw[->, dashed] (gene) -- node[edge_label, left] {EXPRESSED\_IN} (location);
@@ -293,7 +298,8 @@ UniProt \citep{UniProt2023} & Proteine, Gen-Links & TSV & Integriert \\
 HGNC \citep{Braschi2019} & Gennomenklatur & TSV & Integriert \\
 Uberon \citep{Mungall2012} & Anatomische Lokalisationen & OBO & Integriert \\
 Cell Ontology \citep{Diehl2016} & Zelltypen & OBO & Integriert \\
-OMIM / HPO \citep{Robinson2008} & Krankheit-Gen-Links & --- & Geplant \\
+KEGG \citep{Kanehisa2023} & Pathway-Karten & REST API & Geplant \\
+OMIM \citep{Amberger2019} / HPO \citep{Robinson2008} & Krankheit-Gen-Links & --- & Geplant \\
 \bottomrule
 \end{tabular}
 \end{table}
@@ -462,7 +468,7 @@ Nicht alle Pathways haben eine ausreichende Reactome-Abdeckung. Verwaiste Pathwa
 
 \subsection{EHR-Interoperabilitaet}
 
-Ein praktischer Einsatz ausschlussbasierter klinischer Entscheidungsunterstuetzung erfordert die Integration mit elektronischen Gesundheitsaktensystemen (EHR), um strukturierte Laborwerte des Patienten zu erhalten. Ohne interoperablen Zugang zu Echtzeit-Laborwerten ueber Standards wie HL7 FHIR bleibt das System auf manuell eingegebene Messwerte beschraenkt. EHR-Interoperabilitaet ist eine gut dokumentierte Herausforderung in der klinischen Informatik; ihre Loesung liegt ausserhalb des Rahmens dieses Konzeptpapiers, stellt aber eine kritische Anforderung fuer jede zukuenftige klinische Anwendung dar.
+Ein praktischer Einsatz ausschlussbasierter klinischer Entscheidungsunterstuetzung erfordert die Integration mit elektronischen Gesundheitsaktensystemen (EHR), um strukturierte Laborwerte des Patienten zu erhalten. Ohne interoperablen Zugang zu Echtzeit-Laborwerten ueber Standards wie HL7 FHIR \citep{HL7FHIR2023} bleibt das System auf manuell eingegebene Messwerte beschraenkt. EHR-Interoperabilitaet ist eine gut dokumentierte Herausforderung in der klinischen Informatik; ihre Loesung liegt ausserhalb des Rahmens dieses Konzeptpapiers, stellt aber eine kritische Anforderung fuer jede zukuenftige klinische Anwendung dar.
 
 \subsection{Messredundanz und Kontextualitaet}
 
@@ -529,7 +535,7 @@ Zielquellen umfassen Register fuer seltene Erkrankungen (EURORDIS), klinische Sy
 
 \subsection{Primaere Metrik}
 
-Die Kandidatenreduktionsrate (CRR, Gleichung~5) dient als primaeres Erfolgskriterium. Ein CRR $> 0{,}30$ unterstuetzt die Kernhypothese; ein CRR $< 0{,}10$ wuerde auf unzureichenden diagnostischen Mehrwert hinweisen.
+Die Kandidatenreduktionsrate (CRR, Gleichung~\eqref{eq:crr}) dient als primaeres Erfolgskriterium. Ein CRR $> 0{,}30$ unterstuetzt die Kernhypothese; ein CRR $< 0{,}10$ wuerde auf unzureichenden diagnostischen Mehrwert hinweisen.
 
 \textbf{Sicherheitseinschraenkung}: Das bestaetigte ursaechliche Gen darf \emph{niemals} ausgeschlossen werden (Falschausschlussrate = 0). Jeder Falschausschluss im Benchmark invalidiert das Modell fuer die klinische Anwendung.
 
@@ -584,9 +590,13 @@ Die Kernhypothese -- dass Pathway-Ausschluss den Kandidatengenraum um $\geq 30\,
 Der Quellcode des Prototyps, einschliesslich Datenbankschema, Aufnahmepipelines, Ausschluss-Engines und GUI-Anwendung, ist verfuegbar unter \url{https://github.com/lukisch/system-medicine}. Das System integriert ausschliesslich oeffentliche Datenquellen; es werden keine Patientendaten verwendet oder benoetigt.
 
 % ================================================================
-\section*{KI-Offenlegung}
+\section*{KI-Nutzungserklaerung}
 
-Bei der Erstellung dieses Manuskripts wurden KI-gestuetzte Werkzeuge (Claude, Anthropic) eingesetzt, insbesondere fuer Literaturrecherche, Unterstuetzung bei der Codeentwicklung, Textstrukturierung und Uebersetzungshilfe. Der konzeptuelle Entwurf, die wissenschaftliche Argumentation, die formale Modellentwicklung und die Verantwortung fuer alle Inhalte liegen ausschliesslich beim Autor.
+Bei der Erstellung dieses Manuskripts wurden KI-gestuetzte Werkzeuge
+(Claude, Anthropic) unterstuetzend eingesetzt, insbesondere fuer
+Literaturrecherche, Code-Entwicklung, Textstrukturierung und Formulierungshilfe.
+Die inhaltliche Konzeption, wissenschaftliche Argumentation und
+Verantwortung fuer den gesamten Inhalt liegen ausschliesslich beim Autor.
 
 % ================================================================
 \bibliographystyle{apalike}

@@ -59,6 +59,6 @@ def import_uberon(conn, filepath: str) -> int:
         if count % 1000 == 0:
             conn.commit()
     
-    conn.commit()
     insert_data_source(conn, "uberon", filepath, "", "", count)
+    conn.commit()
     return count

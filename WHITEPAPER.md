@@ -1,10 +1,12 @@
 # Functional Pathway-Centric Medical Knowledge Graph with Exclusion Logic
 ## A System-Medicine Architecture for Differential Diagnosis Support
 
+> **Note:** The authoritative technical description is in the LaTeX paper (`paper/SystemMedicine_v1_en.tex`). This whitepaper provides a high-level overview.
+
 **Author:** Lukas Geiger, Independent Researcher, Bernau, Germany
 **Date:** March 2026
-**Status:** DRAFT — Concept Paper v0.1
-**Prototype:** Available at [github.com/lukisch] (link TODO)
+**Status:** DRAFT -- Concept Paper v0.2
+**Prototype:** Available at [github.com/lukisch/system-medicine](https://github.com/lukisch/system-medicine)
 
 ---
 
@@ -38,8 +40,12 @@ Let $s(p_i) \in \{0, 1\}$ be the observed pathway status: 1 = intact, 0 = disrup
 **Exclusion Rule (binary):** If $s(p_i) = 1$, then $\forall g \in \mathcal{E}(p_i)$: gene $g$ is *excluded* as a primary cause.
 
 **Exclusion Score (probabilistic):** For a gene $g$, the exclusion confidence is:
-$$\text{excl}(g) = 1 - \prod_{i: g \in \mathcal{E}(p_i)} (1 - s(p_i) \cdot w_i)$$
-where $w_i \in [0,1]$ is a pathway-specific weight encoding data completeness and pathway redundancy.
+$$\text{excl}(g) = \prod_{i: g \in \mathcal{E}(p_i)} c(p_i) \cdot b(g)$$
+where $c(p_i) \in [0,1]$ is the pathway status confidence (intact: 0.95, unknown: 0.50, disrupted: 0.05), and $b(g) \in [0,1]$ is a multi-pathway bonus factor:
+$$b(g) = \min(1.0,\; 0.7 + 0.1 \cdot |\{p_i : g \in \mathcal{E}(p_i) \wedge s(p_i) = 1\}|)$$
+The *suspicion score* incorporates gene redundancy:
+$$\text{susp}(g) = (1 - \text{excl}(g)) \cdot r(g)$$
+where $r(g) \in \{1.0, 0.85, 0.6, 0.3\}$ maps the gene's redundancy degree (none, low, medium, high).
 
 **Research question:** Does the pathway-centric exclusion model reduce the candidate gene space significantly compared to symptom-only filtering, measured against known genetic diagnoses?
 
@@ -84,7 +90,8 @@ The prototype uses **SQLite** as the backend, with relational tables simulating 
 | HGNC | Gene nomenclature | Integrated |
 | Uberon | Anatomical locations | Integrated |
 | Cell Ontology | Cell types | Integrated |
-| OMIM / HPO | Disease-gene associations | %TODO: not yet integrated |
+| KEGG | Pathway maps | Planned |
+| OMIM / HPO | Disease-gene associations | Planned |
 
 ---
 
@@ -102,7 +109,7 @@ The binary exclusion model assumes that pathways are *functionally independent*:
 
 ### 4.2 Essentiality Definition
 
-"Essential gene" is defined operationally as a gene annotated in Reactome as *required* for at least one reaction in the pathway. This definition is conservative (includes genes with modulatory roles) and should be refined using curated essentiality databases (%TODO: DepMap, CRISPR essentiality screens).
+"Essential gene" is defined operationally as a gene annotated in Reactome as *required* for at least one reaction in the pathway. This definition is conservative and should be refined using curated essentiality databases (e.g., DepMap, CRISPR essentiality screens).
 
 ### 4.3 Weighting Factors
 
@@ -114,15 +121,15 @@ The weighting factors $w_i$ in the probabilistic model are currently assigned ma
 
 ### 5.1 Phenotype-Driven Diagnosis Support
 
-Phenomizer \citep{%TODO_Kohler2009} and PhenoTips \citep{%TODO_Girdea2013} match patient phenotypes (HPO terms) to disease databases. These systems excel at symptom-to-disease matching but do not exploit pathway integrity as exclusion evidence.
+Phenomizer (Kohler et al., 2009) and PhenoTips (Girdea et al., 2013) match patient phenotypes (HPO terms) to disease databases. These systems excel at symptom-to-disease matching but do not exploit pathway integrity as exclusion evidence.
 
 ### 5.2 Pathway Analysis in Genomics
 
-GSEA \citep{%TODO_Subramanian2005} and similar tools identify dysregulated pathways from expression data. They work at the population level and require omics data not typically available in clinical settings. The proposed system works with individual patient laboratory values.
+GSEA (Subramanian et al., 2005) and similar tools identify dysregulated pathways from expression data. They work at the population level and require omics data not typically available in clinical settings. The proposed system works with individual patient laboratory values.
 
 ### 5.3 Graph-Based Clinical Reasoning
 
-Knowledge graphs for clinical decision support have been explored in several contexts (%TODO: cite KG-based CDSSs). The distinction of the present approach is the use of pathway status as a *first-class constraint* in exclusion reasoning, rather than as a background annotation.
+Knowledge graphs for clinical decision support have been explored in several contexts, including clinical KGs from electronic health records (Rotmensch et al., 2017), large-scale biomedical KGs like Hetionet (Himmelstein et al., 2017), and LLM-augmented systems such as ESCARGOT (Matsumoto et al., 2025) and HealthGenie (Gao et al., 2025). The distinction of the present approach is the use of pathway status as a *first-class constraint* in exclusion reasoning, rather than as a background annotation.
 
 ### 5.4 Comparison Summary
 
@@ -144,7 +151,7 @@ A validation study requires a curated benchmark of confirmed genetic diagnoses w
 2. The genetic diagnosis is confirmed (variant + phenotype + functional study)
 3. The patient's pathway status can be retrospectively reconstructed from laboratory data
 
-**Target:** 20–50 cases from rare disease registries (%TODO: EURORDIS, OMIM clinical synopsis, published case series). The demo Haemolyse scenario provides proof-of-concept only.
+**Target:** 20--50 cases from rare disease registries (EURORDIS, OMIM clinical synopsis, published case series). The demo hemolysis scenario provides proof-of-concept only.
 
 ### 6.2 Primary Metric
 
@@ -198,15 +205,20 @@ Key open tasks before academic publication:
 
 ## References
 
-%TODO: Replace all %TODO_* placeholders with complete bibliographic entries.
-
-<!--
-Suggested references (verify before use):
-- Köhler et al. (2009). Clinical diagnostics in human genetics with semantic similarity searches in ontologies. Am J Hum Genet.
-- Girdea et al. (2013). PhenoTips: patient phenotyping software for clinical and research use. Hum Mutat.
-- Subramanian et al. (2005). Gene set enrichment analysis: A knowledge-based approach. PNAS.
-- Fabregat et al. (2018). The Reactome Pathway Knowledgebase. Nucleic Acids Res.
-- Ashburner et al. (2000). Gene Ontology: tool for the unification of biology. Nat Genet.
-- Robinson et al. (2008). The Human Phenotype Ontology. Am J Hum Genet.
-- The UniProt Consortium (2023). UniProt: the Universal Protein Knowledgebase. Nucleic Acids Res.
--->
+- Amberger, J.S. et al. (2019). OMIM.org: leveraging knowledge across phenotype-gene relationships. *Nucleic Acids Research*, 47(D1), D1038--D1043.
+- Ashburner, M. et al. (2000). Gene Ontology: tool for the unification of biology. *Nature Genetics*, 25(1), 25--29.
+- Braschi, B. et al. (2019). Genenames.org: the HGNC and VGNC resources in 2019. *Nucleic Acids Research*, 47(D1), D786--D792.
+- Diehl, A.D. et al. (2016). The Cell Ontology 2016: enhanced content, modularization, and ontology interoperability. *J Biomed Semantics*, 7(1), 44.
+- Fabregat, A. et al. (2018). The Reactome Pathway Knowledgebase. *Nucleic Acids Research*, 46(D1), D649--D655.
+- Gao, F. et al. (2025). HealthGenie: A Knowledge-Driven LLM Framework for Tailored Dietary Guidance. *CIKM '25*, 6639--6643.
+- Girdea, M. et al. (2013). PhenoTips: patient phenotyping software for clinical and research use. *Human Mutation*, 34(8), 1057--1065.
+- Himmelstein, D.S. et al. (2017). Systematic integration of biomedical knowledge prioritizes drugs for repurposing. *eLife*, 6, e26726.
+- HL7 International (2023). FHIR Release 5. https://hl7.org/fhir/R5/
+- Kanehisa, M. et al. (2023). KEGG for taxonomy-based analysis of pathways and genomes. *Nucleic Acids Research*, 51(D1), D587--D592.
+- Kohler, S. et al. (2009). Clinical diagnostics in human genetics with semantic similarity searches in ontologies. *Am J Hum Genet*, 85(4), 457--464.
+- Matsumoto, N. et al. (2025). ESCARGOT: an AI agent leveraging LLMs, dynamic graph of thoughts, and biomedical KGs. *Bioinformatics*, 41(2).
+- Mungall, C.J. et al. (2012). Uberon, an integrative multi-species anatomy ontology. *Genome Biology*, 13(1), R5.
+- Robinson, P.N. et al. (2008). The Human Phenotype Ontology. *Am J Hum Genet*, 83(5), 610--615.
+- Rotmensch, M. et al. (2017). Learning a health knowledge graph from electronic medical records. *Scientific Reports*, 7(1), 5994.
+- Subramanian, A. et al. (2005). Gene set enrichment analysis: A knowledge-based approach. *PNAS*, 102(43), 15545--15550.
+- The UniProt Consortium (2023). UniProt: the Universal Protein Knowledgebase in 2023. *Nucleic Acids Research*, 51(D1), D523--D531.

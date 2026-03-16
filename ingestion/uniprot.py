@@ -3,7 +3,7 @@ import csv
 import os
 import sys
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-from database import insert_data_source
+from database import insert_data_source, add_external_reference
 
 
 def import_uniprot(conn, filepath: str) -> int:
@@ -39,23 +39,30 @@ def import_uniprot(conn, filepath: str) -> int:
             ).fetchone()
             
             if existing:
-                # Update mit UniProt-Info falls external_id noch leer
-                conn.execute(
-                    "UPDATE genes_proteins SET external_id = COALESCE(NULLIF(external_id, ''), ?) "
-                    "WHERE symbol = ? AND (external_id IS NULL OR external_id = '')",
-                    (f"UniProt:{accession}", symbol)
-                )
+                gene_id = existing[0]
             else:
                 conn.execute(
                     "INSERT OR IGNORE INTO genes_proteins "
                     "(symbol, name, external_id) VALUES (?, ?, ?)",
                     (symbol, protein_name, f"UniProt:{accession}")
                 )
+                row = conn.execute(
+                    "SELECT id FROM genes_proteins WHERE symbol = ?", (symbol,)
+                ).fetchone()
+                gene_id = row[0] if row else None
+
+            # External Reference fuer Multi-Source-Lookup (BUG-10 Fix):
+            # Statt external_id zu ueberschreiben (was HGNC-ID verliert),
+            # wird die UniProt-Accession als separate Referenz gespeichert.
+            if gene_id:
+                add_external_reference(conn, "gene", gene_id, "uniprot",
+                                       f"UniProt:{accession}")
+
             count += 1
             
             if count % 5000 == 0:
                 conn.commit()
     
-    conn.commit()
     insert_data_source(conn, "uniprot_human", filepath, "", "", count)
+    conn.commit()
     return count

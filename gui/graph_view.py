@@ -544,9 +544,10 @@ class GraphExplorer(QWidget):
         if self._worker_thread and self._worker_thread.isRunning():
             self._worker_thread.quit()
             self._worker_thread.wait(2000)
-        if self._worker:
-            self._worker.deleteLater()
-            self._worker = None
+        # Kein manuelles deleteLater auf _worker -- das uebernimmt
+        # finished.connect(deleteLater) weiter unten. Doppeltes deleteLater
+        # bei schnellem Doppelklick fuehrt zu Segfault.
+        self._worker = None
         if self._worker_thread:
             self._worker_thread.deleteLater()
             self._worker_thread = None

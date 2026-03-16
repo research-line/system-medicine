@@ -168,6 +168,18 @@ def init_db(conn):
 
     CREATE INDEX IF NOT EXISTS idx_sig_components ON signature_components(signature_id);
 
+    -- Externe Referenzen (Multi-Source ID-Mapping)
+    -- Ermoeglicht mehrere externe IDs pro Entitaet (HGNC, UniProt, etc.)
+    -- statt nur ein einziges external_id Feld.
+    CREATE TABLE IF NOT EXISTS external_references (
+        entity_type TEXT NOT NULL,
+        entity_id INTEGER NOT NULL,
+        source TEXT NOT NULL,
+        external_id TEXT NOT NULL,
+        PRIMARY KEY (entity_type, entity_id, source)
+    );
+    CREATE INDEX IF NOT EXISTS idx_extref_lookup ON external_references(source, external_id);
+
     -- Indizes
     CREATE INDEX IF NOT EXISTS idx_pathways_external ON functional_pathways(external_id);
     CREATE INDEX IF NOT EXISTS idx_locations_organ ON body_locations(organ);
@@ -189,7 +201,6 @@ def insert_pathway(conn, name, description="", output="",
         "INSERT OR IGNORE INTO functional_pathways "
         "(name, description, output, time_dimension, status) VALUES (?,?,?,?,?)",
         (name, description, output, time_dimension, status))
-    conn.commit()
     return conn.execute(
         "SELECT id FROM functional_pathways WHERE name=?", (name,)).fetchone()[0]
 
@@ -200,7 +211,6 @@ def insert_location(conn, organ, subcompartment="", circulation_type="",
         "INSERT OR IGNORE INTO body_locations "
         "(organ, subcompartment, circulation_type, immune_role) VALUES (?,?,?,?)",
         (organ, subcompartment, circulation_type, immune_role))
-    conn.commit()
     return conn.execute(
         "SELECT id FROM body_locations WHERE organ=? AND subcompartment=?",
         (organ, subcompartment)).fetchone()[0]
@@ -212,7 +222,6 @@ def insert_cell_type(conn, name, lineage="", maturation_stage="",
         "INSERT OR IGNORE INTO cell_types "
         "(name, lineage, maturation_stage, lifespan, mobility) VALUES (?,?,?,?,?)",
         (name, lineage, maturation_stage, lifespan, mobility))
-    conn.commit()
     return conn.execute(
         "SELECT id FROM cell_types WHERE name=?", (name,)).fetchone()[0]
 
@@ -223,7 +232,6 @@ def insert_gene(conn, symbol, name="", function_type="regulatorisch",
         "INSERT OR IGNORE INTO genes_proteins "
         "(symbol, name, function_type, redundancy_degree) VALUES (?,?,?,?)",
         (symbol, name, function_type, redundancy_degree))
-    conn.commit()
     return conn.execute(
         "SELECT id FROM genes_proteins WHERE symbol=?", (symbol,)).fetchone()[0]
 
@@ -236,7 +244,6 @@ def insert_measurement(conn, name, unit="", ref_range_low=None,
         "(name, unit, ref_range_low, ref_range_high, loinc_code, measurement_site) "
         "VALUES (?,?,?,?,?,?)",
         (name, unit, ref_range_low, ref_range_high, loinc_code, measurement_site))
-    conn.commit()
     return conn.execute(
         "SELECT id FROM measurements WHERE name=?", (name,)).fetchone()[0]
 
@@ -246,7 +253,6 @@ def insert_diagnosis(conn, name, description="", icd_code=""):
         "INSERT OR IGNORE INTO diagnoses "
         "(name, description, icd_code) VALUES (?,?,?)",
         (name, description, icd_code))
-    conn.commit()
     return conn.execute(
         "SELECT id FROM diagnoses WHERE name=?", (name,)).fetchone()[0]
 
@@ -259,13 +265,35 @@ def insert_data_source(conn, name, url="", version="", sha256="", record_count=0
         "INSERT OR REPLACE INTO data_sources "
         "(name, url, version, download_date, sha256, record_count) VALUES (?,?,?,?,?,?)",
         (name, url, version, datetime.now().isoformat(), sha256, record_count))
-    conn.commit()
 
 
 def get_data_source(conn, name):
     """Liefert Metadaten einer Datenquelle oder None."""
     row = conn.execute(
         "SELECT * FROM data_sources WHERE name=?", (name,)).fetchone()
+    return dict(row) if row else None
+
+
+# --- External References CRUD ---
+
+def add_external_reference(conn, entity_type, entity_id, source, external_id):
+    """Fuegt eine externe Referenz hinzu (z.B. HGNC, UniProt, Reactome).
+
+    Ermoeglicht Multi-Source ID-Mapping: ein Gen kann gleichzeitig eine
+    HGNC-ID, UniProt-Accession und weitere externe IDs haben.
+    """
+    conn.execute("INSERT OR IGNORE INTO external_references VALUES (?,?,?,?)",
+                 (entity_type, entity_id, source, external_id))
+
+
+def lookup_by_external_id(conn, source, external_id):
+    """Sucht eine Entitaet anhand einer externen ID.
+
+    Returns: Dict mit entity_type und entity_id, oder None.
+    """
+    row = conn.execute(
+        "SELECT entity_type, entity_id FROM external_references WHERE source=? AND external_id=?",
+        (source, external_id)).fetchone()
     return dict(row) if row else None
 
 
@@ -276,7 +304,6 @@ def insert_signature(conn, name, description="", icd_codes=""):
         "INSERT OR IGNORE INTO measurement_signatures "
         "(name, description, icd_codes) VALUES (?,?,?)",
         (name, description, icd_codes))
-    conn.commit()
     return conn.execute(
         "SELECT id FROM measurement_signatures WHERE name=?", (name,)).fetchone()[0]
 
@@ -286,7 +313,6 @@ def link_signature_measurement(conn, signature_id, measurement_id,
     conn.execute(
         "INSERT OR IGNORE INTO signature_components VALUES (?,?,?,?)",
         (signature_id, measurement_id, expected_direction, weight))
-    conn.commit()
 
 
 # --- Edge Helpers ---
@@ -295,14 +321,12 @@ def link_pathway_location(conn, pathway_id, location_id, relation="laeuft_in"):
     conn.execute(
         "INSERT OR IGNORE INTO pathway_locations VALUES (?,?,?)",
         (pathway_id, location_id, relation))
-    conn.commit()
 
 
 def link_pathway_cell(conn, pathway_id, cell_type_id, relation="benoetigt"):
     conn.execute(
         "INSERT OR IGNORE INTO pathway_cells VALUES (?,?,?)",
         (pathway_id, cell_type_id, relation))
-    conn.commit()
 
 
 def link_gene_pathway(conn, gene_id, pathway_id, relation="moduliert",
@@ -310,7 +334,6 @@ def link_gene_pathway(conn, gene_id, pathway_id, relation="moduliert",
     conn.execute(
         "INSERT OR IGNORE INTO gene_pathways VALUES (?,?,?,?)",
         (gene_id, pathway_id, relation, int(is_essential)))
-    conn.commit()
 
 
 def link_measurement_pathway(conn, measurement_id, pathway_id,
@@ -318,7 +341,6 @@ def link_measurement_pathway(conn, measurement_id, pathway_id,
     conn.execute(
         "INSERT OR IGNORE INTO measurement_pathways VALUES (?,?,?)",
         (measurement_id, pathway_id, relation))
-    conn.commit()
 
 
 def link_measurement_location(conn, measurement_id, location_id,
@@ -326,7 +348,6 @@ def link_measurement_location(conn, measurement_id, location_id,
     conn.execute(
         "INSERT OR IGNORE INTO measurement_locations VALUES (?,?,?)",
         (measurement_id, location_id, relation))
-    conn.commit()
 
 
 def link_pathway_diagnosis(conn, pathway_id, diagnosis_id,
@@ -334,14 +355,12 @@ def link_pathway_diagnosis(conn, pathway_id, diagnosis_id,
     conn.execute(
         "INSERT OR IGNORE INTO pathway_diagnoses VALUES (?,?,?)",
         (pathway_id, diagnosis_id, relation))
-    conn.commit()
 
 
 def link_gene_expression(conn, gene_id, location_id, level="normal"):
     conn.execute(
         "INSERT OR IGNORE INTO gene_expressions VALUES (?,?,?)",
         (gene_id, location_id, level))
-    conn.commit()
 
 
 def set_pathway_status(conn, pathway_id, status):

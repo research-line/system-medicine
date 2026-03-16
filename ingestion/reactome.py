@@ -33,8 +33,8 @@ def import_reactome_pathways(conn, filepath: str) -> int:
             if count % 1000 == 0:
                 conn.commit()
     
-    conn.commit()
     insert_data_source(conn, "reactome_pathways", filepath, "", "", count)
+    conn.commit()
     return count
 
 
@@ -48,15 +48,18 @@ def import_reactome_uniprot(conn, filepath: str) -> int:
     """
     count = 0
     
-    # Lookup-Dicts im Speicher aufbauen (statt pro Zeile DB-Query)
-    gene_lookup = {}  # uniprot_id -> gene_db_id
-    for row in conn.execute(
-        "SELECT id, external_id FROM genes_proteins WHERE external_id IS NOT NULL"
-    ).fetchall():
-        ext = row["external_id"]
-        if ext and ext.startswith("UniProt:"):
-            uid = ext.split(":", 1)[1].split(";")[0].strip()
-            gene_lookup[uid] = row["id"]
+    # Lookup-Dict via external_references Tabelle (BUG-10 Fix):
+    # Statt nach external_id LIKE "UniProt:%" in genes_proteins zu suchen
+    # (was scheitert wenn HGNC die external_id bereits belegt hat),
+    # nutzen wir die dedizierte external_references Tabelle.
+    gene_lookup = {}  # uniprot_accession -> gene_db_id
+    for row in conn.execute("""
+        SELECT er.external_id, er.entity_id as gene_id
+        FROM external_references er
+        WHERE er.source = 'uniprot' AND er.entity_type = 'gene'
+    """).fetchall():
+        accession = row["external_id"].replace("UniProt:", "")
+        gene_lookup[accession] = row["gene_id"]
     
     pathway_lookup = {}  # reactome_id -> pathway_db_id
     for row in conn.execute(
@@ -107,6 +110,6 @@ def import_reactome_uniprot(conn, filepath: str) -> int:
             "(gene_id, pathway_id, relation) VALUES (?, ?, ?)",
             batch
         )
-    conn.commit()
     insert_data_source(conn, "reactome_uniprot", filepath, "", "", count)
+    conn.commit()
     return count

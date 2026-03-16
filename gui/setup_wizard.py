@@ -150,12 +150,15 @@ class SetupWizard(QDialog):
         init_db(self.conn)
         
         self.log.append("Lade Haemolyse-Szenario...")
-        from ingestion.seed_data import seed_haemolyse
+        from ingestion.seed_data import seed_haemolyse, seed_clinical_panels
         seed_haemolyse(self.conn)
-        
+
+        self.log.append("Lade klinische Laborpanels (65+ Messwerte)...")
+        seed_clinical_panels(self.conn)
+
         self.progress.setRange(0, 100)
         self.progress.setValue(100)
-        self.log.append("Fertig! Demo-Daten erfolgreich geladen.")
+        self.log.append("Fertig! Demo-Daten + klinische Panels geladen.")
         self.btn_close.setEnabled(True)
     
     def _start_download(self):

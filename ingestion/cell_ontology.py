@@ -40,6 +40,6 @@ def import_cell_ontology(conn, filepath: str) -> int:
         if count % 1000 == 0:
             conn.commit()
     
-    conn.commit()
     insert_data_source(conn, "cell_ontology", filepath, "", "", count)
+    conn.commit()
     return count
