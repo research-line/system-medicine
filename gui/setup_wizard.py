@@ -150,7 +150,7 @@ class SetupWizard(QDialog):
         init_db(self.conn)
         
         self.log.append("Lade Haemolyse-Szenario...")
-        from ingestion.seed_data import seed_haemolyse, seed_clinical_panels, seed_expanded_systems
+        from ingestion.seed_data import seed_haemolyse, seed_clinical_panels, seed_expanded_systems, seed_expanded_v2
         seed_haemolyse(self.conn)
 
         self.log.append("Lade klinische Laborpanels (65+ Messwerte)...")
@@ -158,6 +158,9 @@ class SetupWizard(QDialog):
 
         self.log.append("Lade erweiterte Systeme (Immunologie, Endokrinologie, Onkologie, Blutgas...)...")
         seed_expanded_systems(self.conn)
+
+        self.log.append("Lade Erweiterung v2 (GI, Knochen, Thrombophilie, Allergologie, Hepatitis...)...")
+        seed_expanded_v2(self.conn)
 
         self.progress.setRange(0, 100)
         self.progress.setValue(100)

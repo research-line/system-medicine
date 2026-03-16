@@ -11,19 +11,20 @@ System-Medizin modelliert den menschlichen Koerper als Netzwerk von **Funktionsp
 - **Pattern-Detection:** Automatische Erkennung bekannter Messwert-Signaturen (z.B. Haemolyse, Lupus, Sepsis, Cushing).
 - **Diagnose-Queries:** Von auffaelligen Messwerten ueber Verdachtspfade zu Kandidatengenen und empfohlenen Zusatztests.
 
-## Datenabdeckung (v0.3)
+## Datenabdeckung (v0.4)
 
 | Kategorie | Anzahl |
 |-----------|--------|
-| Funktionspfade | 36 |
-| Laborparameter | 111 |
-| Gene/Proteine | 50 |
-| Diagnosen | 41 |
-| Messwert-Signaturen | 26 |
-| Koerperorte | 22 |
-| Zelltypen | 21 |
+| Funktionspfade | 51 |
+| Laborparameter | 151 |
+| Gene/Proteine | 70 |
+| Diagnosen | 68 |
+| Messwert-Signaturen | 42 |
+| Koerperorte | 28 |
+| Zelltypen | 25 |
+| Graph-Kanten | 696 |
 
-Abgedeckte Fachbereiche: Haematologie, Hepatologie, Nephrologie, Endokrinologie (Schilddruese, HPA-Achse, Gonaden, PTH), Immunologie (Komplement, T-Zellen, NK-Zellen), Kardiologie, Onkologie-Marker, Blutgasanalyse, Rheumatologie, Haemostase, Pneumologie, Gastroenterologie.
+Abgedeckte Fachbereiche: Haematologie, Hepatologie, Nephrologie, Endokrinologie (Schilddruese, HPA-Achse, Gonaden, PTH), Immunologie (Komplement, T-Zellen, NK-Zellen, IgE/Allergie), Kardiologie, Onkologie-Marker, Blutgasanalyse, Rheumatologie, Haemostase (inkl. Thrombophilie, Fibrinolyse), Pneumologie, Gastroenterologie (CED, Zoeliakie, Pankreasinsuffizienz), Infektiologie (Hepatitis-Serologie), Autoimmunologie (Hashimoto, Basedow, PBC, AIH), Urindiagnostik, Neurologie-Marker, Osteologie, Kupfer-Metabolismus, Allergologie.
 
 ## Installation
 

@@ -8,7 +8,8 @@ from PySide6.QtWidgets import (
     QGroupBox, QLabel, QPushButton, QComboBox, QLineEdit,
     QTableWidget, QTableWidgetItem, QTextEdit,
     QHeaderView, QAbstractItemView, QCheckBox, QSpinBox,
-    QDoubleSpinBox, QFormLayout, QListWidget, QListWidgetItem
+    QDoubleSpinBox, QFormLayout, QListWidget, QListWidgetItem,
+    QCompleter
 )
 from PySide6.QtCore import Qt, Signal
 from PySide6.QtGui import QColor
@@ -105,10 +106,18 @@ class DiagnoseQueryPanel(QWidget):
         layout.addWidget(splitter)
     
     def _load_measurements(self):
+        self.meas_combo.setEditable(True)
+        self.meas_combo.setInsertPolicy(QComboBox.NoInsert)
         rows = self.conn.execute("SELECT name, unit FROM measurements ORDER BY name LIMIT 500").fetchall()
+        names = []
         for r in rows:
             unit = f" [{r['unit']}]" if r["unit"] else ""
             self.meas_combo.addItem(f"{r['name']}{unit}", r["name"])
+            names.append(f"{r['name']}{unit}")
+        completer = QCompleter(names)
+        completer.setCaseSensitivity(Qt.CaseInsensitive)
+        completer.setFilterMode(Qt.MatchContains)
+        self.meas_combo.setCompleter(completer)
     
     def _load_diagnoses(self):
         rows = self.conn.execute("SELECT name FROM diagnoses ORDER BY name").fetchall()
@@ -204,9 +213,10 @@ class DataBrowserPanel(QWidget):
             "functional_pathways", "body_locations", "cell_types",
             "genes_proteins", "measurements", "diagnoses",
             "gene_pathways", "pathway_locations", "pathway_cells",
-            "measurement_pathways", "pathway_diagnoses", "gene_expressions",
-            "data_sources",
-            "measurement_signatures", "signature_components"
+            "measurement_pathways", "measurement_locations",
+            "pathway_diagnoses", "gene_expressions",
+            "measurement_signatures", "signature_components",
+            "external_references", "data_sources",
         ])
         self.table_combo.currentTextChanged.connect(self._load_table)
         toolbar.addWidget(self.table_combo, 2)
