@@ -1,85 +1,136 @@
-# System-Medizin Prototyp
+# System-Medizin
 
-Funktionspfad-zentrierter medizinischer Knowledge Graph mit Ausschlusslogik.
+[![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
+[![Python 3.10+](https://img.shields.io/badge/Python-3.10%2B-blue.svg)](https://www.python.org/)
+[![PySide6](https://img.shields.io/badge/GUI-PySide6-green.svg)](https://doc.qt.io/qtforpython/)
 
-## Was ist System-Medizin?
+A **functional-pathway-centric medical knowledge graph** with exclusion logic for differential diagnosis support.
 
-System-Medizin modelliert den menschlichen Koerper als Netzwerk von **Funktionspfaden** (biologische Prozesse), die ueber Gene, Proteine, Koerperorte und Messwerte miteinander verknuepft sind. Statt isolierter Symptombetrachtung ermoeglicht der Graph-Ansatz:
+> **Research tool only.** This is not a clinical decision support system and must not be used for medical decisions.
 
-- **Ausschlusslogik:** Intakte Pfade beweisen, dass ihre essenziellen Gene funktionieren -- diese Gene koennen als Ursache ausgeschlossen werden.
-- **Probabilistische Analyse:** Konfidenzwerte fuer Gen-Ausschluss basierend auf Pfad-Evidenz, Redundanz und Multi-Pfad-Staerkung.
-- **Pattern-Detection:** Automatische Erkennung bekannter Messwert-Signaturen (z.B. Haemolyse, Lupus, Sepsis, Cushing).
-- **Diagnose-Queries:** Von auffaelligen Messwerten ueber Verdachtspfade zu Kandidatengenen und empfohlenen Zusatztests.
+## What is System-Medizin?
 
-## Datenabdeckung (v0.4)
+System-Medizin models the human body as a network of **functional pathways** (biological processes) linked through genes, proteins, laboratory values, anatomical locations, cell types, and clinical diagnoses. Instead of isolated symptom matching, the graph-based approach enables:
 
-| Kategorie | Anzahl |
-|-----------|--------|
-| Funktionspfade | 51 |
-| Laborparameter | 151 |
-| Gene/Proteine | 70 |
-| Diagnosen | 68 |
-| Messwert-Signaturen | 42 |
-| Koerperorte | 28 |
-| Zelltypen | 25 |
-| Graph-Kanten | 696 |
+- **Exclusion Logic:** If a functional pathway is demonstrated intact (via normal lab markers), all genes essential for that pathway can be excluded as primary disease causes.
+- **Probabilistic Analysis:** Confidence scores for gene exclusion based on pathway evidence, redundancy, and multi-pathway reinforcement.
+- **Pattern Detection:** Automatic recognition of known measurement signatures (e.g., hemolysis, lupus, sepsis, Cushing's).
+- **Diagnostic Queries:** From abnormal measurements via suspect pathways to candidate genes and recommended follow-up tests.
 
-Abgedeckte Fachbereiche: Haematologie, Hepatologie, Nephrologie, Endokrinologie (Schilddruese, HPA-Achse, Gonaden, PTH), Immunologie (Komplement, T-Zellen, NK-Zellen, IgE/Allergie), Kardiologie, Onkologie-Marker, Blutgasanalyse, Rheumatologie, Haemostase (inkl. Thrombophilie, Fibrinolyse), Pneumologie, Gastroenterologie (CED, Zoeliakie, Pankreasinsuffizienz), Infektiologie (Hepatitis-Serologie), Autoimmunologie (Hashimoto, Basedow, PBC, AIH), Urindiagnostik, Neurologie-Marker, Osteologie, Kupfer-Metabolismus, Allergologie.
+## Data Coverage (v0.4)
 
-## Installation
+| Category | Count |
+|----------|-------|
+| Functional Pathways | 51 |
+| Laboratory Parameters | 151 |
+| Genes/Proteins | 70 |
+| Diagnoses | 68 |
+| Measurement Signatures | 42 |
+| Body Locations | 28 |
+| Cell Types | 25 |
+| Graph Edges | 696 |
+
+**Covered domains:** Hematology, Hepatology, Nephrology, Endocrinology (Thyroid, HPA axis, Gonads, PTH), Immunology (Complement, T-cells, NK-cells, IgE/Allergy), Cardiology, Oncology markers, Blood gas analysis, Rheumatology, Hemostasis (incl. Thrombophilia, Fibrinolysis), Pulmonology, Gastroenterology (IBD, Celiac, Pancreatic insufficiency), Infectiology (Hepatitis serology), Autoimmunology (Hashimoto, Graves', PBC, AIH), Urine diagnostics, Neurology markers, Osteology, Copper metabolism, Allergology.
+
+## Getting Started
+
+### Requirements
+
+- Python 3.10+
+- Windows / Linux / macOS
+
+### Installation
 
 ```bash
+git clone https://github.com/research-line/system-medicine.git
+cd system-medicine
 pip install -r requirements.txt
 ```
 
-## Starten
+### Run
 
 ```bash
 python main.py
 ```
 
-Oder unter Windows: `START.bat` doppelklicken.
+On Windows you can also double-click `START.bat`.
 
-Beim ersten Start erscheint ein Setup-Wizard. Ueber "Demo-Daten laden" werden alle Datenpanels angelegt (Haemolyse, klinische Laborpanels, erweiterte Systeme).
+On first launch a **Setup Wizard** appears. Click "Load Demo Data" to populate all data panels (hemolysis scenario, clinical lab panels, extended systems).
 
-## Architektur
+## Architecture
 
 ```
-prototype/
-  main.py              # Einstiegspunkt
-  config.py             # Pfade, Datenquellen, Farben
-  database.py           # SQLite-Schema, CRUD-Helpers
-  START.bat             # Windows-Starter
+system-medicine/
+  main.py              # Entry point
+  config.py            # Paths, data sources, colors
+  database.py          # SQLite schema, CRUD helpers
   engine/
-    exclusion.py        # Binaere + probabilistische Ausschlusslogik
-    query.py            # Graph-Traversal, Diagnose-Queries, Pattern-Detection
-    reasoning.py        # Menschenlesbare Erklaerungen
+    exclusion.py       # Binary + probabilistic exclusion logic
+    query.py           # Graph traversal, diagnostic queries, pattern detection
+    reasoning.py       # Human-readable explanations
   gui/
-    app.py              # Hauptfenster (4 Tabs)
-    theme.py            # Dark-Theme Stylesheet
-    setup_wizard.py     # Erststart-Assistent mit Demo-Daten
-    graph_view.py       # NetworkX Graph-Explorer
-    exclusion_panel.py  # Ausschluss-Analyse (binaer + probabilistisch)
-    data_panel.py       # Diagnose-Query + Daten-Browser
+    app.py             # Main window (4 tabs)
+    theme.py           # Dark theme stylesheet
+    setup_wizard.py    # First-run wizard with demo data
+    graph_view.py      # NetworkX graph explorer
+    exclusion_panel.py # Exclusion analysis (binary + probabilistic)
+    data_panel.py      # Diagnostic query + data browser
   ingestion/
-    manager.py          # Download-Orchestrierung
-    downloader.py       # HTTP-Downloads mit Caching
-    manifest.py         # Datenquellen-Manifest
-    hgnc.py             # HGNC Gen-Nomenklatur Parser
-    uberon.py           # Uberon Anatomie-Ontologie Parser
-    cell_ontology.py    # Cell Ontology Parser
-    uniprot.py          # UniProt Protein-Daten Parser
-    reactome.py         # Reactome Pathway-Daten Parser
-    gene_ontology.py    # Gene Ontology Parser
-    seed_data.py        # Demo-/Seed-Daten (Haemolyse-Szenario)
-  data/                 # Laufzeitdaten (DB, Cache) - in .gitignore
+    manager.py         # Download orchestration
+    downloader.py      # HTTP downloads with caching
+    manifest.py        # Data source manifest
+    hgnc.py            # HGNC gene nomenclature parser
+    uberon.py          # Uberon anatomy ontology parser
+    cell_ontology.py   # Cell Ontology parser
+    uniprot.py         # UniProt protein data parser
+    reactome.py        # Reactome pathway data parser
+    gene_ontology.py   # Gene Ontology parser
+    seed_data.py       # Demo/seed data (hemolysis scenario)
+  paper/               # Methodology paper (EN + DE PDFs)
+  data/                # Runtime data (DB, cache) -- in .gitignore
 ```
 
 ## Features
 
-| Tab | Funktion |
+| Tab | Function |
 |-----|----------|
-| **Graph-Explorer** | Interaktive Visualisierung des Knowledge Graphs mit NetworkX |
-| **Ausschluss-Analyse** | Pfad-Status setzen, binaere + probabilistische Gen-Ausschlussanalyse |
-| **Diagnose-Query** | Auffaellige Messwerte eingeben, Verdachtspfade und -gene ermitteln, Pattern-Detection |
-| **Daten-Browser** | Alle DB-Tabellen durchsuchen inkl. measurement_signatures |
+| **Graph Explorer** | Interactive visualization of the knowledge graph with NetworkX |
+| **Exclusion Analysis** | Set pathway status, run binary + probabilistic gene exclusion |
+| **Diagnostic Query** | Enter abnormal measurements, identify suspect pathways and genes, pattern detection |
+| **Data Browser** | Browse all DB tables including measurement signatures |
+
+## Data Sources
+
+This tool integrates exclusively **public, open-access** biological databases:
+
+- [Reactome](https://reactome.org/) -- Pathway data (CC BY 4.0)
+- [Gene Ontology](http://geneontology.org/) -- Biological process annotations (CC BY 4.0)
+- [UniProt](https://www.uniprot.org/) -- Protein data (CC BY 4.0)
+- [HGNC](https://www.genenames.org/) -- Gene nomenclature (CC0)
+- [Uberon](http://uberon.github.io/) -- Anatomy ontology (CC BY 3.0)
+- [Cell Ontology](https://obophenotype.github.io/cell-ontology/) -- Cell type ontology (CC BY 4.0)
+
+## Methodology
+
+The formal exclusion model (binary and probabilistic variants), assumptions, limitations, and validation framework are described in the accompanying concept paper:
+
+> Geiger, L. (2026). *Functional Pathway-Centric Medical Knowledge Graph with Exclusion Logic for Rare Disease Differential Diagnosis.* See `paper/` directory.
+
+## Contributing
+
+Contributions are welcome! Areas where help is especially valued:
+
+- **Pathway expansion:** Adding new functional pathways with gene/measurement links
+- **OMIM/HPO integration:** Connecting disease-gene associations from OMIM and phenotype data from HPO
+- **Benchmark cases:** Curating validated rare-disease cases for systematic evaluation
+- **Pathway weight calibration:** Data-driven calibration of exclusion confidence weights
+
+Please open an issue first to discuss larger changes.
+
+## License
+
+MIT License -- see [LICENSE](LICENSE).
+
+## Disclaimer
+
+This software is a **research prototype** for exploring pathway-centric exclusion logic. It is **not validated for clinical use** and must not be used for medical diagnosis or treatment decisions. Always consult qualified healthcare professionals.
