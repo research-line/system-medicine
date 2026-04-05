@@ -9,6 +9,8 @@ A **functional-pathway-centric medical knowledge graph** with exclusion logic fo
 
 > **Research tool only.** This is not a clinical decision support system and must not be used for medical decisions.
 
+> **Note on project status:** We are currently unable to actively develop this software and concept further due to time constraints. We would be happy if someone picks this up and are glad to support anyone who does. Feel free to fork, open issues, or reach out.
+
 ## What is System-Medizin?
 
 System-Medizin models the human body as a network of **functional pathways** (biological processes) linked through genes, proteins, laboratory values, anatomical locations, cell types, and clinical diagnoses. Instead of isolated symptom matching, the graph-based approach enables:
