@@ -8,6 +8,9 @@
 \usepackage{amsmath,amssymb,amsthm}
 \usepackage{graphicx}
 \usepackage{booktabs}
+\usepackage{array}
+\usepackage{tabularx}
+\usepackage{xurl}
 \usepackage{hyperref}
 \usepackage[margin=2.5cm]{geometry}
 \usepackage{natbib}
@@ -20,6 +23,9 @@
 \usepackage{subcaption}
 \usepackage{tikz}
 \usetikzlibrary{arrows.meta,positioning,shapes.geometric,calc}
+
+\newcolumntype{Y}{>{\raggedright\arraybackslash}X}
+\emergencystretch=2em
 
 % === Hyperref config ===
 \hypersetup{
@@ -57,7 +63,7 @@
     Independent Researcher, Bernau, Germany\\
     ORCID: \url{https://orcid.org/0009-0005-7296-1534}
 }
-\date{May 2026 --- Concept Paper v2.0}
+\date{May 2026}
 
 \begin{document}
 
@@ -160,6 +166,7 @@ The central entity is the \textbf{FunctionalPathway} node, representing a discre
 
 \begin{figure}[H]
 \centering
+\resizebox{\textwidth}{!}{%
 \begin{tikzpicture}[
     entity/.style={draw, rounded corners, minimum width=2.8cm, minimum height=1cm, font=\small\bfseries, align=center},
     edge_label/.style={font=\scriptsize, fill=white, inner sep=1pt},
@@ -189,8 +196,10 @@ The central entity is the \textbf{FunctionalPathway} node, representing a discre
 
     % Cross-edges
     \draw[->, dashed] (gene) -- node[edge_label, left] {EXPRESSED\_IN} (location);
-    \draw[->, dashed] (measurement) -- node[edge_label, right] {MEASURED\_AT} (location);
+    \draw[->, dashed] (measurement.south west) to[out=205,in=-35]
+        node[edge_label, below, sloped, pos=0.35] {MEASURED\_AT} (location.south east);
 \end{tikzpicture}
+}
 \caption{Entity-relationship diagram of the pathway-centric knowledge graph. Solid arrows indicate primary relationships through the pathway hub; dashed arrows indicate secondary cross-links.}
 \label{fig:schema}
 \end{figure}
@@ -198,7 +207,7 @@ The central entity is the \textbf{FunctionalPathway} node, representing a discre
 Each entity type carries domain-specific attributes:
 
 \begin{itemize}
-    \item \textbf{FunctionalPathway}: name, description, primary output, temporal class (acute/chronic), status (intact/disrupted/unknown), external~ID (Reactome or GO).
+    \item \textbf{FunctionalPathway}: name, description, primary output, temporal class (acute or chronic), status (intact, disrupted, or unknown), and external ID (Reactome/GO).
     \item \textbf{BodyLocation} (Uberon): organ, subcompartment, circulation type, immune role.
     \item \textbf{CellType} (Cell Ontology): lineage, maturation stage, lifespan, mobility.
     \item \textbf{Gene/Protein} (HGNC/UniProt): symbol, function type (structural, regulatory, signaling, metabolic), redundancy degree, expression sites.
@@ -288,7 +297,8 @@ The system integrates six public biological databases, each contributing a speci
 \centering
 \caption{Integrated data sources and their roles.}
 \label{tab:datasources}
-\begin{tabular}{llll}
+\small
+\begin{tabularx}{\textwidth}{@{}YYll@{}}
 \toprule
 \textbf{Source} & \textbf{Entity Type} & \textbf{Format} & \textbf{Status} \\
 \midrule
@@ -301,7 +311,7 @@ Cell Ontology \citep{Diehl2016} & Cell types & OBO & Integrated \\
 KEGG \citep{Kanehisa2023} & Pathway maps & REST API & Planned \\
 OMIM \citep{Amberger2019} / HPO \citep{Robinson2008} & Disease--gene links & --- & Planned \\
 \bottomrule
-\end{tabular}
+\end{tabularx}
 \end{table}
 
 Data ingestion follows a defined order (HGNC $\to$ Uberon $\to$ Cell Ontology $\to$ UniProt $\to$ Reactome $\to$ GO) to satisfy foreign key dependencies. Each source is tracked via a manifest file recording download timestamps, SHA-256 checksums, and import status.
@@ -357,7 +367,7 @@ Given a set of abnormal measurements, the system computes a weighted match score
 Signatures with $\text{match} \geq 0.3$ are reported, enabling rapid identification of known clinical patterns.
 
 % ================================================================
-\section{Demonstration: Hemolysis--Immunodeficiency Scenario}
+\section{Hemolysis and Immunodeficiency Demonstration}
 \label{sec:demo}
 
 The prototype includes a curated seed dataset modeling the intersection of hereditary spherocytosis, autoimmune hemolytic anemia, and agammaglobulinemia. This scenario was chosen because it involves multiple interacting pathways with shared anatomical locations (spleen, bone marrow) and demonstrates the exclusion logic across independent functional domains.

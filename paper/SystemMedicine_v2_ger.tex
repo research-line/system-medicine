@@ -8,6 +8,9 @@
 \usepackage{amsmath,amssymb,amsthm}
 \usepackage{graphicx}
 \usepackage{booktabs}
+\usepackage{array}
+\usepackage{tabularx}
+\usepackage{xurl}
 \usepackage{hyperref}
 \usepackage[margin=2.5cm]{geometry}
 \usepackage{natbib}
@@ -20,6 +23,9 @@
 \usepackage{subcaption}
 \usepackage{tikz}
 \usetikzlibrary{arrows.meta,positioning,shapes.geometric,calc}
+
+\newcolumntype{Y}{>{\raggedright\arraybackslash}X}
+\emergencystretch=2em
 
 % === Hyperref config ===
 \hypersetup{
@@ -57,7 +63,7 @@
     Unabhaengiger Forscher, Bernau, Deutschland\\
     ORCID: \url{https://orcid.org/0009-0005-7296-1534}
 }
-\date{Mai 2026 --- Konzeptpapier v2.0}
+\date{Mai 2026}
 
 \begin{document}
 
@@ -160,6 +166,7 @@ Die zentrale Entitaet ist der \textbf{FunctionalPathway}-Knoten, der einen diskr
 
 \begin{figure}[H]
 \centering
+\resizebox{\textwidth}{!}{%
 \begin{tikzpicture}[
     entity/.style={draw, rounded corners, minimum width=2.8cm, minimum height=1cm, font=\small\bfseries, align=center},
     edge_label/.style={font=\scriptsize, fill=white, inner sep=1pt},
@@ -189,8 +196,10 @@ Die zentrale Entitaet ist der \textbf{FunctionalPathway}-Knoten, der einen diskr
 
     % Cross-edges
     \draw[->, dashed] (gene) -- node[edge_label, left] {EXPRESSED\_IN} (location);
-    \draw[->, dashed] (measurement) -- node[edge_label, right] {MEASURED\_AT} (location);
+    \draw[->, dashed] (measurement.south west) to[out=205,in=-35]
+        node[edge_label, below, sloped, pos=0.35] {MEASURED\_AT} (location.south east);
 \end{tikzpicture}
+}
 \caption{Entity-Relationship-Diagramm des pathway-zentrierten Wissensgraphen. Durchgezogene Pfeile zeigen primaere Beziehungen ueber den Pathway-Hub; gestrichelte Pfeile zeigen sekundaere Querverbindungen.}
 \label{fig:schema}
 \end{figure}
@@ -198,7 +207,7 @@ Die zentrale Entitaet ist der \textbf{FunctionalPathway}-Knoten, der einen diskr
 Jeder Entitaetstyp traegt domaenenspezifische Attribute:
 
 \begin{itemize}
-    \item \textbf{FunctionalPathway}: Name, Beschreibung, primaere Ausgabe, Zeitklasse (akut/chronisch), Status (intakt/gestoert/unbekannt), externe~ID (Reactome oder GO).
+    \item \textbf{FunctionalPathway}: Name, Beschreibung, primaere Ausgabe, Zeitklasse (akut oder chronisch), Status (intakt, gestoert oder unbekannt) und externe ID (Reactome/GO).
     \item \textbf{BodyLocation} (Uberon): Organ, Subkompartiment, Zirkulationstyp, Immunrolle.
     \item \textbf{CellType} (Cell Ontology): Linie, Reifungsstadium, Lebensdauer, Mobilitaet.
     \item \textbf{Gene/Protein} (HGNC/UniProt): Symbol, Funktionstyp (strukturell, regulatorisch, signalgebend, metabolisch), Redundanzgrad, Expressionsorte.
@@ -288,7 +297,8 @@ Das System integriert sechs oeffentliche biologische Datenbanken, die jeweils ei
 \centering
 \caption{Integrierte Datenquellen und ihre Rollen.}
 \label{tab:datasources}
-\begin{tabular}{llll}
+\small
+\begin{tabularx}{\textwidth}{@{}YYll@{}}
 \toprule
 \textbf{Quelle} & \textbf{Entitaetstyp} & \textbf{Format} & \textbf{Status} \\
 \midrule
@@ -301,7 +311,7 @@ Cell Ontology \citep{Diehl2016} & Zelltypen & OBO & Integriert \\
 KEGG \citep{Kanehisa2023} & Pathway-Karten & REST API & Geplant \\
 OMIM \citep{Amberger2019} / HPO \citep{Robinson2008} & Krankheit-Gen-Links & --- & Geplant \\
 \bottomrule
-\end{tabular}
+\end{tabularx}
 \end{table}
 
 Die Datenaufnahme folgt einer definierten Reihenfolge (HGNC $\to$ Uberon $\to$ Cell Ontology $\to$ UniProt $\to$ Reactome $\to$ GO), um Fremdschluesselabhaengigkeiten zu erfuellen. Jede Quelle wird ueber eine Manifestdatei verfolgt, die Download-Zeitstempel, SHA-256-Pruefsummen und Importstatus aufzeichnet.
@@ -357,7 +367,7 @@ Bei einer Menge abnormaler Messwerte berechnet das System einen gewichteten Uebe
 Signaturen mit $\text{match} \geq 0{,}3$ werden gemeldet, was eine schnelle Identifikation bekannter klinischer Muster ermoeglicht.
 
 % ================================================================
-\section{Demonstration: Haemolyse-Immundefizienz-Szenario}
+\section{Haemolyse und Immundefizienz als Demonstration}
 \label{sec:demo}
 
 Der Prototyp enthaelt einen kuratierten Seed-Datensatz, der die Ueberschneidung von hereditaerer Sphaerozy\-tose, autoimmunhaemolytischer Anaemie und Agammaglobulinaemie modelliert. Dieses Szenario wurde gewaehlt, weil es mehrere interagierende Pathways mit gemeinsamen anatomischen Lokalisationen (Milz, Knochenmark) umfasst und die Ausschlusslogik ueber unabhaengige funktionelle Domaenen hinweg demonstriert.
@@ -427,7 +437,7 @@ Das System leitet ab:
     \item Normales IgG $\Rightarrow$ Antikoerperproduktions-Pathway \emph{intakt}.
     \item Haemolyse-Marker abnormal $\Rightarrow$ Haemolyse-Pathway \emph{gestoert}.
     \item NOTCH2 ist essentiell in der Milzfiltration (Status unbekannt) und nicht-essentiell in der B-Zell-Differenzierung $\Rightarrow$ \textbf{bleibt Kandidat}.
-    \item Membrangene (ANK1, SLC4A1, SPTA1, SPTB, EPB42) sind nur im Membranintegritaets-Pathway essentiell (Status unbekannt/gestoert) $\Rightarrow$ \textbf{bleiben Kandidaten}.
+    \item Die Membrangene ANK1, SLC4A1, SPTA1, SPTB und EPB42 sind nur im Membran-Pathway essentiell. Bei unbekanntem oder gestoertem Status $\Rightarrow$ \textbf{bleiben Kandidaten}.
 \end{enumerate}
 
 Ergebnis: 3 von 10 essentiellen Genen ausgeschlossen (CRR = 30\,\%), was der Hypothesenschwelle entspricht. Die verbleibenden Kandidaten umfassen korrekt die membranstrukturellen Gene, die mit hereditaerer Sphaero\-zytose assoziiert sind.
