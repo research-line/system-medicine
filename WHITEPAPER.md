@@ -1,7 +1,7 @@
 # Functional Pathway-Centric Medical Knowledge Graph with Exclusion Logic
 ## A System-Medicine Architecture for Differential Diagnosis Support
 
-> **Note:** The authoritative technical description is in the LaTeX paper (`paper/SystemMedicine_v1_en.tex`). This whitepaper provides a high-level overview.
+> **Note:** The authoritative technical description is in the current LaTeX paper package (`paper/SystemMedicine_v2_en.tex`). This whitepaper provides a high-level overview.
 
 **Author:** Lukas Geiger, Independent Researcher, Bernau, Germany
 **Date:** March 2026
@@ -93,21 +93,21 @@ The prototype uses **SQLite** as the backend, with relational tables simulating 
 | KEGG | Pathway maps | Planned |
 | OMIM / HPO | Disease-gene associations | Planned |
 
-### 3.4 Data Coverage (v0.3)
+### 3.4 Data Coverage (v0.4)
 
 The prototype includes curated seed data spanning multiple medical domains:
 
 | Category | Count | Examples |
 |----------|-------|---------|
-| Functional pathways | 36 | Complement cascade, HPA axis, heme biosynthesis, RAAS, DNA repair, apoptosis regulation |
-| Laboratory parameters | 111 | Complete blood count, liver/kidney panels, coagulation, lipids, thyroid, iron, tumor markers, blood gas, hormones, complement, autoimmune markers |
-| Genes/proteins | 50 | Structural (ANK1, VWF), signaling (CD4, ZAP70, STAT1), metabolic (CYP11A1, ALAS2), regulatory (TP53, BRCA1) |
-| Clinical diagnoses | 41 | Rare (porphyria, hemophilia), common (diabetes, CKD), autoimmune (SLE, RA), oncological (CRC, HCC) |
-| Measurement signatures | 26 | Hemolysis, sepsis, Cushing, Addison, lupus, metabolic syndrome, respiratory acidosis |
-| Body locations | 22 | Including adrenal, hypothalamus, pituitary, alveoli, thymus, synovium |
-| Cell types | 21 | Including T-lymphocytes, NK cells, osteoblasts, alveolar type II cells, dendritic cells |
+| Functional pathways | 51 | Complement cascade, HPA axis, heme biosynthesis, RAAS, DNA repair, apoptosis regulation |
+| Laboratory parameters | 151 | Complete blood count, liver/kidney panels, coagulation, lipids, thyroid, iron, tumor markers, blood gas, hormones, complement, autoimmune markers |
+| Genes/proteins | 70 | Structural (ANK1, VWF), signaling (CD4, ZAP70, STAT1), metabolic (CYP11A1, ALAS2), regulatory (TP53, BRCA1) |
+| Clinical diagnoses | 68 | Rare (porphyria, hemophilia), common (diabetes, CKD), autoimmune (SLE, RA), oncological (CRC, HCC) |
+| Measurement signatures | 42 | Hemolysis, sepsis, Cushing, Addison, lupus, metabolic syndrome, respiratory acidosis |
+| Body locations | 28 | Including adrenal, hypothalamus, pituitary, alveoli, thymus, synovium |
+| Cell types | 25 | Including T-lymphocytes, NK cells, osteoblasts, alveolar type II cells, dendritic cells |
 
-The data model supports 7 edge types with 125 measurement-pathway links, 52 gene-pathway links (with essentiality flags), and 54 pathway-diagnosis associations.
+The data model supports 7 edge types with 192 measurement-pathway links, 77 gene-pathway links (with essentiality flags), and 99 pathway-diagnosis associations.
 
 ---
 
@@ -208,7 +208,7 @@ The system should be benchmarked against at least one existing tool (Phenomizer 
 
 ## 8. Conclusion
 
-The functional pathway-centric knowledge graph represents a structurally distinct approach to differential diagnosis support, exploiting pathway-status evidence as explicit diagnostic constraints. The prototype implementation demonstrates feasibility across all core components: data ingestion, graph modeling, exclusion reasoning, and visualization, now spanning 36 pathways across 10 medical domains with 111 laboratory parameters, 50 genes, 41 diagnoses, and 26 diagnostic signatures. The core hypothesis—that pathway exclusion reduces the candidate gene space by ≥ 30% without false exclusions—is testable and constitutes the primary empirical target for future work.
+The functional pathway-centric knowledge graph represents a structurally distinct approach to differential diagnosis support, exploiting pathway-status evidence as explicit diagnostic constraints. The prototype implementation demonstrates feasibility across all core components: data ingestion, graph modeling, exclusion reasoning, and visualization, now spanning 51 pathways with 151 laboratory parameters, 70 genes, 68 diagnoses, and 42 diagnostic signatures. The core hypothesis—that pathway exclusion reduces the candidate gene space by ≥ 30% without false exclusions—is testable and constitutes the primary empirical target for future work.
 
 Key open tasks before academic publication:
 1. Curated benchmark dataset (20–50 cases from rare disease registries)

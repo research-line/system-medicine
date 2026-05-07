@@ -1,6 +1,10 @@
 __pycache__/
 *.pyc
 data/system_medizin.db
+data/*.db
+data/*.db-*
+data/*.sqlite
+data/*.sqlite-*
 data/cache/
 data/manifest.json
 *.egg-info/
