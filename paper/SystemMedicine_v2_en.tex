@@ -11,7 +11,6 @@
 \usepackage{array}
 \usepackage{tabularx}
 \usepackage{xurl}
-\usepackage{hyperref}
 \usepackage[margin=2.5cm]{geometry}
 \usepackage{natbib}
 \usepackage{algorithm}
@@ -23,18 +22,23 @@
 \usepackage{subcaption}
 \usepackage{tikz}
 \usetikzlibrary{arrows.meta,positioning,shapes.geometric,calc}
+\usepackage{hyperref}
 
 \newcolumntype{Y}{>{\raggedright\arraybackslash}X}
 \emergencystretch=2em
+\providecommand*{\HyperDestNameFilter}[1]{en.#1}
 
 % === Hyperref config ===
 \hypersetup{
+    unicode=true,
     colorlinks=true,
     linkcolor=blue!60!black,
     citecolor=green!50!black,
     urlcolor=blue!70!black,
     pdftitle={Functional Pathway-Centric Medical Knowledge Graph with Exclusion Logic},
     pdfauthor={Lukas Geiger},
+    pdfsubject={System-medicine concept paper on pathway-centric exclusion logic for differential-diagnosis research},
+    pdfkeywords={knowledge graph, differential diagnosis, functional pathways, exclusion reasoning, system medicine, Reactome, Gene Ontology},
 }
 
 % === Listings config ===
@@ -71,39 +75,40 @@
 
 % ================================================================
 \begin{abstract}
-We present the design and prototype implementation of a functional pathway-centric medical knowledge graph intended to support differential diagnosis. Standard clinical decision support systems organize knowledge around diagnoses, symptoms, or genes as primary entities. In contrast, the proposed system uses \emph{biological functional pathways} as its central organizing principle, linking genes, proteins, laboratory values, anatomical locations, cell types, and clinical diagnoses as secondary annotations.
+We present the design and prototype implementation of a functional pathway-centric medical knowledge graph for differential-diagnosis research. Many clinical decision support systems organize knowledge around diagnoses, symptoms, or genes as primary entities. In contrast, the proposed system uses \emph{biological functional pathways} as its central organizing principle, linking genes, proteins, laboratory values, anatomical locations, cell types, and clinical diagnoses as secondary annotations.
 
-This architecture enables a novel form of \emph{exclusion reasoning}: if a functional pathway is demonstrated to be intact (via normal laboratory markers), all genes essential and sufficient for that pathway can be excluded as primary causes of disease in the current patient. The system is implemented as a SQLite-backed prototype with a PySide6 graphical interface, integrating public data sources (Reactome, Gene Ontology, UniProt, HGNC, Uberon, Cell Ontology).
+This architecture supports a specific form of \emph{exclusion reasoning}: if a functional pathway is treated as sufficiently intact on the basis of laboratory markers, genes that are required for that pathway can be deprioritized as primary causes of disease in the current patient, subject to redundancy, pleiotropy, and measurement-quality constraints. The system is implemented as a SQLite-backed prototype with a PySide6 graphical interface and integrates public data sources (Reactome, Gene Ontology, UniProt, HGNC, Uberon, Cell Ontology).
 
-We describe the formal exclusion model---both binary and probabilistic variants---its assumptions and limitations, and propose a validation framework. The prototype is demonstrated on a hemolysis--immunodeficiency scenario involving five functional pathways, eleven genes, and seven laboratory markers. The system is positioned as a research tool for exploring the pathway-centric paradigm, not as a clinical decision support system.
+We describe the formal exclusion model---in both binary and probabilistic variants---together with its assumptions, limitations, and validation requirements. The prototype is demonstrated on a hemolysis--immunodeficiency scenario involving five functional pathways, eleven genes, and seven laboratory markers. The system is positioned as a research tool for exploring pathway-centric exclusion logic, not as a validated clinical decision support system.
 \end{abstract}
 
 \smallskip
 \noindent\textbf{Keywords:} knowledge graph, differential diagnosis, functional pathways, exclusion reasoning, system medicine, Reactome, Gene Ontology
+\clearpage
 
 % ================================================================
 \section{Introduction and Motivation}
 \label{sec:introduction}
 
-Differential diagnosis in complex, multi-system diseases frequently fails not from lack of data but from the inability to systematically integrate heterogeneous evidence. A patient with abnormal laboratory values may have hundreds of candidate genetic causes; current clinical tools largely present these as ranked lists without exploiting the logical structure of \emph{excluded} possibilities.
+Differential diagnosis in complex, multi-system diseases often fails not only because data are missing, but because heterogeneous evidence is difficult to integrate systematically. A patient with abnormal laboratory values may have hundreds of candidate genetic causes; current clinical tools often present these as ranked lists without making full use of the logical structure of \emph{excluded} possibilities.
 
 The central observation motivating this work is:
 
 \begin{quote}
-\emph{If a biological functional pathway is demonstrably intact, then all genes that are both necessary and sufficient for that pathway can be excluded as primary causes of dysfunction.}
+\emph{If a biological functional pathway is sufficiently supported as intact, then genes whose pathogenic effect would be expected to disrupt that pathway can be deprioritized as primary causes of dysfunction.}
 \end{quote}
 
-This transforms positive evidence (intact pathway) into negative diagnostic constraints (excluded genes), potentially reducing the candidate space substantially before differential diagnosis is applied.
+This transforms positive evidence (apparently intact pathway function) into negative diagnostic constraints (lower-priority candidate genes), potentially reducing the candidate space before more detailed differential-diagnostic reasoning is applied.
 
 Existing systems organize knowledge differently. PhenoTips \citep{Girdea2013} and Phenomizer \citep{Kohler2009} match patient phenotypes to disease databases via the Human Phenotype Ontology \citep{Robinson2008}. These systems excel at symptom-to-disease matching but do not exploit pathway integrity as exclusion evidence. Pathway databases such as Reactome \citep{Fabregat2018} and KEGG \citep{Kanehisa2023} organize around biochemical reactions but are not designed for clinical exclusion reasoning. Gene Ontology \citep{Ashburner2000} provides fine-grained process descriptions but lacks the clinical decision framework.
 
-The proposed system bridges this gap by treating functional pathways as \emph{first-class entities} in a knowledge graph, with all other biomedical concepts---genes, anatomical locations, cell types, laboratory markers, and diagnoses---attached as secondary annotations. This structural choice enables a formal exclusion logic that is both computationally tractable and biologically meaningful.
+The proposed system addresses this gap by treating functional pathways as \emph{first-class entities} in a knowledge graph, with all other biomedical concepts---genes, anatomical locations, cell types, laboratory markers, and diagnoses---attached as secondary annotations. This structural choice makes pathway-status reasoning explicit and computationally tractable while preserving a biologically interpretable intermediate layer.
 
 \subsection{Contributions}
 
 \begin{enumerate}
     \item A \textbf{data model} centering on functional pathways as the primary organizing principle for clinical reasoning, linking six entity types through semantically typed edges.
-    \item A \textbf{formal exclusion framework} with both binary and probabilistic variants, enabling systematic elimination of candidate genes based on pathway integrity evidence.
+    \item A \textbf{formal exclusion framework} with both binary and probabilistic variants, enabling systematic prioritization and deprioritization of candidate genes based on pathway-integrity evidence.
     \item A \textbf{prototype implementation} with data ingestion from six public biological databases, an interactive graph explorer, and a diagnosis query engine.
     \item A \textbf{validation framework} specifying metrics, benchmark requirements, and comparison criteria for evaluating the approach.
 \end{enumerate}
@@ -118,7 +123,7 @@ Let $\mathcal{P} = \{p_1, \ldots, p_n\}$ be the set of biological functional pat
 
 \begin{definition}[Binary Exclusion Rule]
 \label{def:binary}
-If $s(p_i) = 1$, then $\forall\, g \in \mathcal{E}(p_i)$: gene~$g$ is \emph{excluded} as a primary cause of disease, provided $g$ is essential only in pathways that are all intact:
+If $s(p_i) = 1$, then $\forall\, g \in \mathcal{E}(p_i)$: gene~$g$ is marked as \emph{excluded} from the current primary-cause candidate set, provided $g$ is essential only in pathways that are all assessed as intact:
 \begin{equation}
     \text{excluded}(g) \iff \forall\, p_i \text{ s.t. } g \in \mathcal{E}(p_i): s(p_i) = 1
 \end{equation}
@@ -147,7 +152,7 @@ where $r(g) \in \{1.0, 0.85, 0.6, 0.3\}$ maps the gene's redundancy degree (none
 \emph{Pathway-status-based exclusion logic systematically reduces the candidate gene set for complex rare disease cases by at least 30\% relative to phenotype-only filtering, when evaluated on a curated benchmark dataset.}
 \end{quote}
 
-This is a specific, falsifiable hypothesis. The 30\% threshold is set as a minimal clinically meaningful reduction; a null result ($<10\%$ reduction) would indicate that the exclusion logic adds little diagnostic value beyond existing tools.
+This is a specific, falsifiable hypothesis. The 30\% threshold is used here as a pragmatic target for a meaningful reduction in review workload; a null result ($<10\%$ reduction) would indicate that the exclusion logic adds little value beyond existing filtering tools.
 
 The candidate reduction rate (CRR) is defined as:
 \begin{equation}
@@ -354,7 +359,7 @@ The probabilistic engine (Definition~\ref{def:probabilistic}) extends the binary
     \item \textbf{Redundancy weighting}: The suspicion score is modulated by the gene's redundancy degree. Genes with no functional backup (redundancy = ``none'') receive full suspicion weight ($r = 1.0$); highly redundant genes receive reduced weight ($r = 0.3$).
 \end{enumerate}
 
-Genes are categorized by exclusion confidence: high ($\geq 0.8$), moderate ($0.3$--$0.8$), or suspect ($< 0.3$). This tripartite classification provides clinicians with a ranked prioritization rather than a binary decision.
+Genes are categorized by exclusion confidence: high ($\geq 0.8$), moderate ($0.3$--$0.8$), or suspect ($< 0.3$). This tripartite classification is intended to support ranked review rather than to produce an automatic clinical decision.
 
 \subsection{Pattern Detection}
 
@@ -440,7 +445,7 @@ The system derives:
     \item Membrane genes (ANK1, SLC4A1, SPTA1, SPTB, EPB42) are essential only in the membrane integrity pathway (status unknown/disrupted) $\Rightarrow$ \textbf{remain candidates}.
 \end{enumerate}
 
-Result: 3 of 10 essential genes excluded (CRR = 30\%), matching the hypothesis threshold. The remaining candidates correctly include the membrane-structural genes associated with hereditary spherocytosis.
+Result: 3 of 10 essential genes are deprioritized (CRR = 30\%), matching the hypothesis threshold in this demonstration case. The remaining candidates include the membrane-structural genes associated with hereditary spherocytosis.
 
 % ================================================================
 \section{Assumptions and Limitations}
@@ -460,7 +465,7 @@ The probabilistic model partially mitigates these limitations through continuous
 
 \subsection{Essentiality Definition}
 
-``Essential gene'' is defined operationally as a gene annotated in Reactome or curated sources as \emph{required} for at least one reaction in the pathway. This definition is conservative and should be refined using curated essentiality databases (e.g., DepMap, CRISPR essentiality screens).
+``Essential gene'' is defined operationally as a gene annotated in Reactome or curated sources as \emph{required} for at least one reaction in the pathway. This definition is intentionally conservative and should be refined using curated essentiality databases (e.g., DepMap, CRISPR essentiality screens) and disease-specific expert review.
 
 \subsection{Database Backend}
 
@@ -494,7 +499,7 @@ Phenomizer \citep{Kohler2009} and PhenoTips \citep{Girdea2013} represent the sta
 
 \subsection{Pathway Analysis in Genomics}
 
-Gene Set Enrichment Analysis (GSEA) \citep{Subramanian2005} and related tools identify dysregulated pathways from expression data. These methods operate at the population level and require omics data not typically available in routine clinical settings. The proposed system works with individual patient laboratory values, making it applicable in standard clinical workflows.
+Gene Set Enrichment Analysis (GSEA) \citep{Subramanian2005} and related tools identify dysregulated pathways from expression data. These methods operate at the population level and require omics data that are not typically available in routine clinical settings. The proposed system instead works with individual patient laboratory values, making it closer to standard clinical workflows, although clinical applicability remains to be validated.
 
 \subsection{Graph-Based Clinical Reasoning}
 
@@ -549,9 +554,9 @@ The candidate reduction rate (CRR, Equation~\eqref{eq:crr}) serves as the primar
 
 \textbf{Safety constraint}: The confirmed causal gene must \emph{never} be excluded (false exclusion rate = 0). Any false exclusion in the benchmark invalidates the model for clinical application.
 
-\subsection{Alternative Validation: Synthetic Patient Personas}
+\subsection{Alternative Validation: Synthetic Patient Scenarios}
 
-An alternative validation pathway addresses the scarcity of annotated real-world datasets for rare diseases. LLM-generated synthetic patient personas can be constructed by introducing targeted perturbations in the pathway graph---for example, simulating an ANK1 defect by setting the erythrocyte membrane integrity pathway to ``disrupted'' and deriving consistent laboratory values. Since the causal gene is defined \emph{a priori}, the exclusion engine can be evaluated with exact ground truth: the system must exclude non-causal genes (measuring CRR) while never excluding the planted causal gene (measuring false exclusion rate). This approach complements the real-case benchmark and permits systematic testing across a wider range of disease scenarios than may be available from registries alone.
+An alternative validation pathway addresses the scarcity of annotated real-world datasets for rare diseases. Synthetic patient scenarios can be constructed by introducing targeted perturbations in the pathway graph---for example, simulating an ANK1 defect by setting the erythrocyte membrane integrity pathway to ``disrupted'' and deriving internally consistent laboratory values. Because the causal gene is defined \emph{a priori}, the exclusion engine can be evaluated against exact internal ground truth: the system should deprioritize non-causal genes (measuring CRR) while retaining the planted causal gene (measuring false exclusion rate). This approach complements, but cannot replace, a real-case benchmark; it is useful for stress-testing the algorithmic logic rather than for estimating clinical performance.
 
 \subsection{Secondary Metrics}
 
@@ -569,9 +574,9 @@ The pathway-centric approach addresses a structural gap in current clinical deci
 
 Several design decisions merit discussion:
 
-\paragraph{Why pathways as center, not genes or diagnoses?} Genes are causes; diagnoses are consequences. Neither provides the mechanistic intermediate layer needed for exclusion reasoning. Pathways represent the functional units that connect genetic causes to clinical effects, making them the natural pivot for both inclusion and exclusion logic.
+\paragraph{Why pathways as the center, not genes or diagnoses?} Genes are candidate causes; diagnoses are clinical endpoints. Neither alone provides the mechanistic intermediate layer needed for exclusion reasoning. Pathways represent functional units that connect genetic variation to clinical effects, making them a useful pivot for both inclusion and exclusion logic.
 
-\paragraph{Binary vs.\ probabilistic exclusion.} The binary model is conceptually simpler and easier to validate (a gene is either excluded or not), but it cannot express uncertainty. The probabilistic model captures graded evidence but requires calibrated parameters. We recommend the binary model for initial validation and the probabilistic model for clinical exploration.
+\paragraph{Binary vs.\ probabilistic exclusion.} The binary model is conceptually simpler and easier to validate (a gene is either retained or deprioritized), but it cannot express uncertainty. The probabilistic model captures graded evidence but requires calibrated parameters. We therefore treat the binary model as the initial validation target and the probabilistic model as an exploratory extension.
 
 \paragraph{Scalability.} The current prototype handles the demonstration scenario ($\sim$50 nodes, $\sim$80 edges) without performance concerns. Scaling to the full Reactome database ($>$2400 pathways, $>$10{,}000 reactions) will require performance testing and likely a migration to a graph database backend.
 
@@ -579,7 +584,7 @@ Several design decisions merit discussion:
 \section{Conclusion and Future Work}
 \label{sec:conclusion}
 
-The functional pathway-centric knowledge graph represents a structurally distinct approach to differential diagnosis support, exploiting pathway-status evidence as explicit diagnostic constraints. The prototype implementation demonstrates feasibility across all core components: data ingestion from six public databases, graph modeling with semantic edge types, binary and probabilistic exclusion reasoning, pattern detection, and interactive visualization.
+The functional pathway-centric knowledge graph represents a structurally distinct approach to differential-diagnosis research, using pathway-status evidence as explicit diagnostic constraints. The prototype implementation demonstrates technical feasibility across all core components: data ingestion from six public databases, graph modeling with semantic edge types, binary and probabilistic exclusion reasoning, pattern detection, and interactive visualization.
 
 The core hypothesis---that pathway exclusion reduces the candidate gene space by $\geq 30\%$ without false exclusions---is testable and constitutes the primary empirical target for future work.
 

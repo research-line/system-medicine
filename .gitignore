@@ -35,7 +35,13 @@ ZENODO_CREDENTIALS.md
 INTEGRATIONSPLAN*.md
 REVISE.txt
 SOLVED*.txt
+FORSCHUNGSSTAND.md
+GAPS.md
+POI-USECASES.md
+VERGRIFFEN.md
 _archive/
+_results/
+_sources/
 _reviews/
 _copilot/
 _partners/

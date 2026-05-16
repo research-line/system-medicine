@@ -11,7 +11,6 @@
 \usepackage{array}
 \usepackage{tabularx}
 \usepackage{xurl}
-\usepackage{hyperref}
 \usepackage[margin=2.5cm]{geometry}
 \usepackage{natbib}
 \usepackage{algorithm}
@@ -23,18 +22,23 @@
 \usepackage{subcaption}
 \usepackage{tikz}
 \usetikzlibrary{arrows.meta,positioning,shapes.geometric,calc}
+\usepackage{hyperref}
 
 \newcolumntype{Y}{>{\raggedright\arraybackslash}X}
 \emergencystretch=2em
+\providecommand*{\HyperDestNameFilter}[1]{ger.#1}
 
 % === Hyperref config ===
 \hypersetup{
+    unicode=true,
     colorlinks=true,
     linkcolor=blue!60!black,
     citecolor=green!50!black,
     urlcolor=blue!70!black,
     pdftitle={Funktionaler pathway-zentrierter medizinischer Wissensgraph mit Ausschlusslogik},
     pdfauthor={Lukas Geiger},
+    pdfsubject={Systemmedizinisches Konzeptpapier zur pathway-zentrierten Ausschlusslogik fuer die Differentialdiagnoseforschung},
+    pdfkeywords={Wissensgraph, Differentialdiagnose, funktionelle Pathways, Ausschlusslogik, Systemmedizin, Reactome, Gene Ontology},
 }
 
 % === Listings config ===
@@ -56,11 +60,11 @@
 \title{%
     \textbf{Funktionaler pathway-zentrierter medizinischer Wissensgraph\\
     mit Ausschlusslogik}\\[0.5em]
-    \large Eine systemmedizinische Architektur zur Unterst"utzung der Differentialdiagnose
+    \large Eine systemmedizinische Architektur zur Unterstützung der Differentialdiagnose
 }
 \author{
     Lukas Geiger\\
-    Unabh"angiger Forscher, Bernau, Deutschland\\
+    Unabhängiger Forscher, Bernau, Deutschland\\
     ORCID: \url{https://orcid.org/0009-0005-7296-1534}
 }
 \date{Mai 2026}
@@ -71,15 +75,16 @@
 
 % ================================================================
 \begin{abstract}
-Wir stellen den Entwurf und die prototypische Implementierung eines funktionalen pathway-zentrierten medizinischen Wissensgraphen vor, der die Differentialdiagnose unterst"utzen soll. Herk"ommliche klinische Entscheidungsunterst"utzungssysteme organisieren Wissen um Diagnosen, Symptome oder Gene als prim"are Entit"aten. Im Gegensatz dazu verwendet das vorgeschlagene System \emph{biologische funktionelle Pathways} als zentrales Ordnungsprinzip, wobei Gene, Proteine, Laborwerte, anatomische Lokalisationen, Zelltypen und klinische Diagnosen als sekund"are Annotationen verkn"upft werden.
+Wir stellen den Entwurf und die prototypische Implementierung eines funktionalen pathway-zentrierten medizinischen Wissensgraphen f"ur die Differentialdiagnoseforschung vor. Herk"ommliche klinische Entscheidungsunterst"utzungssysteme organisieren Wissen um Diagnosen, Symptome oder Gene als prim"are Entit"aten. Im Gegensatz dazu verwendet das vorgeschlagene System \emph{biologische funktionelle Pathways} als zentrales Ordnungsprinzip, wobei Gene, Proteine, Laborwerte, anatomische Lokalisationen, Zelltypen und klinische Diagnosen als sekund"are Annotationen verkn"upft werden.
 
-Diese Architektur erm"oglicht eine neuartige Form des \emph{Ausschlussschlie{\ss}ens}: Wenn ein funktioneller Pathway nachweislich intakt ist ("uber normale Labormarker), k"onnen alle Gene, die f"ur diesen Pathway essentiell und hinreichend sind, als prim"are Krankheitsursachen beim aktuellen Patienten ausgeschlossen werden. Das System ist als SQLite-gest"utzter Prototyp mit einer grafischen PySide6-Oberfl"ache implementiert und integriert "offentliche Datenquellen (Reactome, Gene Ontology, UniProt, HGNC, Uberon, Cell Ontology).
+Diese Architektur unterst"utzt eine spezifische Form des \emph{Ausschlussschlie{\ss}ens}: Wenn ein funktioneller Pathway auf Basis von Laborwerten als hinreichend intakt gilt, k"onnen Gene, die f"ur diesen Pathway erforderlich sind, als prim"are Krankheitsursachen beim aktuellen Patienten zur"uckgestuft werden, vorbehaltlich von Redundanz, Pleiotropie und Einschr"ankungen der Messqualit"at. Das System ist als SQLite-gest"utzter Prototyp mit einer grafischen PySide6-Oberfl"ache implementiert und integriert "offentliche Datenquellen (Reactome, Gene Ontology, UniProt, HGNC, Uberon, Cell Ontology).
 
-Wir beschreiben das formale Ausschlussmodell -- sowohl in bin"arer als auch in probabilistischer Variante -- seine Annahmen und Einschr"ankungen und schlagen ein Validierungsframework vor. Der Prototyp wird an einem H"amolyse-Immundefizienz-Szenario demonstriert, das f"unf funktionelle Pathways, elf Gene und sieben Labormarker umfasst. Das System ist als Forschungswerkzeug zur Erkundung des pathway-zentrierten Paradigmas positioniert, nicht als klinisches Entscheidungsunterst"utzungssystem.
+Wir beschreiben das formale Ausschlussmodell -- sowohl in bin"arer als auch in probabilistischer Variante -- seine Annahmen und Einschr"ankungen und schlagen ein Validierungsframework vor. Der Prototyp wird an einem H"amolyse-Immundefizienz-Szenario demonstriert, das f"unf funktionelle Pathways, elf Gene und sieben Labormarker umfasst. Das System ist als Forschungswerkzeug zur Erkundung pathway-zentrierter Ausschlusslogik positioniert, nicht als validiertes klinisches Entscheidungsunterst"utzungssystem.
 \end{abstract}
 
 \smallskip
 \noindent\textbf{Schl"usselw"orter:} Wissensgraph, Differentialdiagnose, funktionelle Pathways, Ausschlusslogik, Systemmedizin, Reactome, Gene Ontology
+\clearpage
 
 % ================================================================
 \section{Einleitung und Motivation}
@@ -90,20 +95,20 @@ Die Differentialdiagnose bei komplexen Multisystemerkrankungen scheitert h"aufig
 Die zentrale Beobachtung, die diese Arbeit motiviert, lautet:
 
 \begin{quote}
-\emph{Wenn ein biologischer funktioneller Pathway nachweislich intakt ist, dann k"onnen alle Gene, die f"ur diesen Pathway sowohl notwendig als auch hinreichend sind, als prim"are Ursachen einer Funktionsst"orung ausgeschlossen werden.}
+\emph{Wenn ein biologischer funktioneller Pathway durch die vorliegenden Daten hinreichend als intakt gest"utzt ist, dann k"onnen Gene, deren pathogene Wirkung diesen Pathway voraussichtlich st"oren w"urde, als prim"are Ursachen einer Funktionsst"orung zur"uckgestuft werden.}
 \end{quote}
 
-Dies transformiert positive Evidenz (intakter Pathway) in negative diagnostische Einschr"ankungen (ausgeschlossene Gene) und kann den Kandidatenraum erheblich reduzieren, bevor die Differentialdiagnose angewendet wird.
+Dies transformiert positive Evidenz (offenbar intakte Pathway-Funktion) in negative diagnostische Einschr"ankungen (niedriger priorisierte Kandidatengene) und kann so den Kandidatenraum verkleinern, bevor eine detailliertere differentialdiagnostische Pr"ufung erfolgt.
 
 Bestehende Systeme organisieren Wissen unterschiedlich. PhenoTips \citep{Girdea2013} und Phenomizer \citep{Kohler2009} gleichen Patientenph"anotypen "uber die Human Phenotype Ontology \citep{Robinson2008} mit Krankheitsdatenbanken ab. Diese Systeme sind hervorragend im Symptom-Krankheits-Abgleich, nutzen aber nicht die Pathway-Integrit"at als Ausschlussbeleg. Pathway-Datenbanken wie Reactome \citep{Fabregat2018} und KEGG \citep{Kanehisa2023} organisieren sich um biochemische Reaktionen, sind aber nicht f"ur klinisches Ausschlussschlie{\ss}en konzipiert. Gene Ontology \citep{Ashburner2000} liefert feingranulare Prozessbeschreibungen, es fehlt jedoch der klinische Entscheidungsrahmen.
 
-Das vorgeschlagene System schlie{\ss}t diese L"ucke, indem es funktionelle Pathways als \emph{erstrangige Entit"aten} in einem Wissensgraphen behandelt, wobei alle anderen biomedizinischen Konzepte -- Gene, anatomische Lokalisationen, Zelltypen, Labormarker und Diagnosen -- als sekund"are Annotationen angebunden werden. Diese strukturelle Entscheidung erm"oglicht eine formale Ausschlusslogik, die sowohl rechnerisch handhabbar als auch biologisch sinnvoll ist.
+Das vorgeschlagene System schlie{\ss}t diese L"ucke, indem es funktionelle Pathways als \emph{erstrangige Entit"aten} in einem Wissensgraphen behandelt, wobei alle anderen biomedizinischen Konzepte -- Gene, anatomische Lokalisationen, Zelltypen, Labormarker und Diagnosen -- als sekund"are Annotationen angebunden werden. Diese strukturelle Entscheidung macht Pathway-Status-Schlie{\ss}en explizit und rechnerisch handhabbar, ohne die biologisch interpretierbare Zwischenschicht zu verlieren.
 
 \subsection{Beitr"age}
 
 \begin{enumerate}
     \item Ein \textbf{Datenmodell}, das funktionelle Pathways als zentrales Ordnungsprinzip f"ur klinisches Schlie{\ss}en verwendet und sechs Entit"atstypen "uber semantisch typisierte Kanten verkn"upft.
-    \item Ein \textbf{formales Ausschlussframework} mit sowohl bin"arer als auch probabilistischer Variante, das die systematische Eliminierung von Kandidatengenen auf Basis von Pathway-Integrit"atsevidenz erm"oglicht.
+    \item Ein \textbf{formales Ausschlussframework} mit sowohl bin"arer als auch probabilistischer Variante, das die systematische Priorisierung und Zur"uckstufung von Kandidatengenen auf Basis von Pathway-Integrit"atsevidenz erm"oglicht.
     \item Eine \textbf{prototypische Implementierung} mit Datenaufnahme aus sechs "offentlichen biologischen Datenbanken, einem interaktiven Graphen-Explorer und einer Diagnoseabfrage-Engine.
     \item Ein \textbf{Validierungsframework}, das Metriken, Benchmark-Anforderungen und Vergleichskriterien zur Bewertung des Ansatzes spezifiziert.
 \end{enumerate}
@@ -118,7 +123,7 @@ Sei $\mathcal{P} = \{p_1, \ldots, p_n\}$ die Menge der biologischen funktionelle
 
 \begin{definition}[Bin"are Ausschlussregel]
 \label{def:binary}
-Wenn $s(p_i) = 1$, dann gilt $\forall\, g \in \mathcal{E}(p_i)$: Gen~$g$ ist als prim"are Krankheitsursache \emph{ausgeschlossen}, sofern $g$ nur in Pathways essentiell ist, die alle intakt sind:
+Wenn $s(p_i) = 1$, dann gilt $\forall\, g \in \mathcal{E}(p_i)$: Gen~$g$ ist im aktuellen Kandidatenset f"ur prim"are Krankheitsursachen als \emph{ausgeschlossen} markiert, sofern $g$ nur in Pathways essentiell ist, die alle intakt sind:
 \begin{equation}
     \text{excluded}(g) \iff \forall\, p_i \text{ s.t. } g \in \mathcal{E}(p_i): s(p_i) = 1
 \end{equation}
@@ -354,7 +359,7 @@ Die probabilistische Engine (Definition~\ref{def:probabilistic}) erweitert das b
     \item \textbf{Redundanzgewichtung}: Der Verdachtswert wird durch den Redundanzgrad des Gens moduliert. Gene ohne funktionelle Absicherung (Redundanz = "`keine"') erhalten volles Verdachtsgewicht ($r = 1{,}0$); hoch redundante Gene erhalten reduziertes Gewicht ($r = 0{,}3$).
 \end{enumerate}
 
-Gene werden nach Ausschlusskonfidenz kategorisiert: hoch ($\geq 0{,}8$), moderat ($0{,}3$--$0{,}8$) oder verd"achtig ($< 0{,}3$). Diese dreiteilige Klassifikation bietet Klinikern eine priorisierte Rangliste anstelle einer bin"aren Entscheidung.
+Gene werden nach Ausschlusskonfidenz kategorisiert: hoch ($\geq 0{,}8$), moderat ($0{,}3$--$0{,}8$) oder verd"achtig ($< 0{,}3$). Diese dreiteilige Klassifikation soll eine priorisierte fachliche Pr"ufung unterst"utzen, statt automatisch eine klinische Entscheidung zu erzeugen.
 
 \subsection{Mustererkennung}
 
@@ -440,7 +445,7 @@ Das System leitet ab:
     \item Die Membrangene ANK1, SLC4A1, SPTA1, SPTB und EPB42 sind nur im Membran-Pathway essentiell. Bei unbekanntem oder gest"ortem Status $\Rightarrow$ \textbf{bleiben Kandidaten}.
 \end{enumerate}
 
-Ergebnis: 3 von 10 essentiellen Genen ausgeschlossen (CRR = 30\,\%), was der Hypothesenschwelle entspricht. Die verbleibenden Kandidaten umfassen korrekt die membranstrukturellen Gene, die mit heredit"arer Sph"aro\-zytose assoziiert sind.
+Ergebnis: 3 von 10 essentiellen Genen werden zur"uckgestuft (CRR = 30\,\%), was in diesem Demonstrationsfall der Hypothesenschwelle entspricht. Die verbleibenden Kandidaten umfassen die membranstrukturellen Gene, die mit heredit"arer Sph"aro\-zytose assoziiert sind.
 
 % ================================================================
 \section{Annahmen und Einschr"ankungen}
@@ -549,9 +554,9 @@ Die Kandidatenreduktionsrate (CRR, Gleichung~\eqref{eq:crr}) dient als prim"ares
 
 \textbf{Sicherheitseinschr"ankung}: Das best"atigte urs"achliche Gen darf \emph{niemals} ausgeschlossen werden (Falschausschlussrate = 0). Jeder Falschausschluss im Benchmark invalidiert das Modell f"ur die klinische Anwendung.
 
-\subsection{Alternative Validierung: Synthetische Patientenpersonas}
+\subsection{Alternative Validierung: Synthetische Patientenszenarien}
 
-Ein alternativer Validierungsweg adressiert den Mangel an annotierten realen Datens"atzen f"ur seltene Erkrankungen. LLM-generierte synthetische Patientenpersonas k"onnen durch gezielte St"orungen im Pathway-Graphen konstruiert werden -- beispielsweise durch Simulation eines ANK1-Defekts, indem der Erythrozytenmembranintegrit"ats-Pathway auf "`gest"ort"' gesetzt wird und konsistente Laborwerte abgeleitet werden. Da das urs"achliche Gen \emph{a priori} definiert ist, kann die Ausschluss-Engine mit exakter Grundwahrheit evaluiert werden: Das System muss nicht-urs"achliche Gene ausschlie{\ss}en (Messung der CRR) und darf das eingepflanzte urs"achliche Gen niemals ausschlie{\ss}en (Messung der Falschausschlussrate). Dieser Ansatz erg"anzt den Realfall-Benchmark und erm"oglicht systematisches Testen "uber ein breiteres Spektrum von Krankheitsszenarien, als m"oglicherweise aus Registern allein verf"ugbar ist.
+Ein alternativer Validierungsweg adressiert den Mangel an annotierten realen Datens"atzen f"ur seltene Erkrankungen. Synthetische Patientenszenarien k"onnen durch gezielte St"orungen im Pathway-Graphen konstruiert werden -- beispielsweise durch Simulation eines ANK1-Defekts, indem der Erythrozytenmembranintegrit"ats-Pathway auf "`gest"ort"' gesetzt wird und intern konsistente Laborwerte abgeleitet werden. Da das urs"achliche Gen \emph{a priori} definiert ist, kann die Ausschluss-Engine mit exakter interner Grundwahrheit evaluiert werden: Das System sollte nicht-urs"achliche Gene zur"uckstufen (Messung der CRR) und das eingepflanzte urs"achliche Gen beibehalten (Messung der Falschausschlussrate). Dieser Ansatz erg"anzt einen Realfall-Benchmark, kann ihn aber nicht ersetzen; er eignet sich dazu, die algorithmische Logik einem Stresstest zu unterziehen, nicht dazu, klinische Leistungsf"ahigkeit zu sch"atzen.
 
 \subsection{Sekund"are Metriken}
 
@@ -571,7 +576,7 @@ Mehrere Designentscheidungen verdienen Diskussion:
 
 \paragraph{Warum Pathways als Zentrum, nicht Gene oder Diagnosen?} Gene sind Ursachen; Diagnosen sind Folgen. Keines von beiden bietet die mechanistische Zwischenschicht, die f"ur Ausschlussschlie{\ss}en ben"otigt wird. Pathways repr"asentieren die funktionellen Einheiten, die genetische Ursachen mit klinischen Auswirkungen verbinden, und sind damit der nat"urliche Drehpunkt f"ur sowohl Einschluss- als auch Ausschlusslogik.
 
-\paragraph{Bin"arer vs.\ probabilistischer Ausschluss.} Das bin"are Modell ist konzeptionell einfacher und leichter zu validieren (ein Gen ist entweder ausgeschlossen oder nicht), kann aber keine Unsicherheit ausdr"ucken. Das probabilistische Modell erfasst abgestufte Evidenz, erfordert jedoch kalibrierte Parameter. Wir empfehlen das bin"are Modell f"ur die initiale Validierung und das probabilistische Modell f"ur die klinische Erkundung.
+\paragraph{Bin"arer vs.\ probabilistischer Ausschluss.} Das bin"are Modell ist konzeptionell einfacher und leichter zu validieren (ein Gen wird entweder beibehalten oder zur"uckgestuft), kann aber keine Unsicherheit ausdr"ucken. Das probabilistische Modell erfasst abgestufte Evidenz, erfordert jedoch kalibrierte Parameter. Wir behandeln deshalb das bin"are Modell als initiales Validierungsziel und das probabilistische Modell als explorative Erweiterung.
 
 \paragraph{Skalierbarkeit.} Der aktuelle Prototyp bew"altigt das Demonstrationsszenario ($\sim$50 Knoten, $\sim$80 Kanten) ohne Leistungsprobleme. Die Skalierung auf die vollst"andige Reactome-Datenbank ($>$2400 Pathways, $>$10\,000 Reaktionen) wird Leistungstests und wahrscheinlich eine Migration zu einem Graphdatenbank-Backend erfordern.
 
@@ -579,7 +584,7 @@ Mehrere Designentscheidungen verdienen Diskussion:
 \section{Fazit und zuk"unftige Arbeiten}
 \label{sec:conclusion}
 
-Der funktionale pathway-zentrierte Wissensgraph repr"asentiert einen strukturell eigenst"andigen Ansatz zur Differentialdiagnose-Unterst"utzung, der Pathway-Status-Evidenz als explizite diagnostische Einschr"ankungen nutzt. Die prototypische Implementierung demonstriert die Machbarkeit "uber alle Kernkomponenten hinweg: Datenaufnahme aus sechs "offentlichen Datenbanken, Graphmodellierung mit semantischen Kantentypen, bin"ares und probabilistisches Ausschlussschlie{\ss}en, Mustererkennung und interaktive Visualisierung.
+Der funktionale pathway-zentrierte Wissensgraph repr"asentiert einen strukturell eigenst"andigen Ansatz zur Differentialdiagnoseforschung, der Pathway-Status-Evidenz als explizite diagnostische Einschr"ankungen nutzt. Die prototypische Implementierung demonstriert die Machbarkeit "uber alle Kernkomponenten hinweg: Datenaufnahme aus sechs "offentlichen Datenbanken, Graphmodellierung mit semantischen Kantentypen, bin"ares und probabilistisches Ausschlussschlie{\ss}en, Mustererkennung und interaktive Visualisierung.
 
 Die Kernhypothese -- dass Pathway-Ausschluss den Kandidatengenraum um $\geq 30\,\%$ ohne Falschausschl"usse reduziert -- ist testbar und stellt das prim"are empirische Ziel f"ur zuk"unftige Arbeiten dar.
 
@@ -591,7 +596,7 @@ Die Kernhypothese -- dass Pathway-Ausschluss den Kandidatengenraum um $\geq 30\,
     \item \textbf{OMIM/HPO-Integration}: Verkn"upfung von Krankheit-Gen-Assoziationen aus OMIM und HPO-Annotationen, um einen direkten Vergleich mit rein ph"anotypbasierter Filterung zu erm"oglichen.
     \item \textbf{Graphdatenbank-Migration}: Evaluation von Neo4j oder "ahnlichen Backends f"ur Skalierbarkeit "uber den SQLite-Prototyp hinaus.
     \item \textbf{Vergleich mit klinischen Werkzeugen}: Benchmark gegen Phenomizer auf demselben Fallsatz zur Quantifizierung des Mehrwerts pathway-zentrierten Ausschlusses.
-    \item \textbf{Temporale Modellierung}: Erweiterung des Frameworks zur Erfassung der Krankheitsprogression und zeitabh"angiger Pathway-Statusaenderungen.
+    \item \textbf{Temporale Modellierung}: Erweiterung des Frameworks zur Erfassung der Krankheitsprogression und zeitabhängiger Pathway-Statusänderungen.
 \end{enumerate}
 
 % ================================================================
