@@ -21,6 +21,7 @@ paper/*.toc
 paper/*.fls
 paper/*.fdb_latexmk
 paper/*.synctex.gz
+paper/extracted_*.txt
 
 # Internal planning documents
 Plan.txt

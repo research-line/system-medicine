@@ -77,7 +77,7 @@
 \begin{abstract}
 We present the design and prototype implementation of a functional pathway-centric medical knowledge graph for differential-diagnosis research. Many clinical decision support systems organize knowledge around diagnoses, symptoms, or genes as primary entities. In contrast, the proposed system uses \emph{biological functional pathways} as its central organizing principle, linking genes, proteins, laboratory values, anatomical locations, cell types, and clinical diagnoses as secondary annotations.
 
-This architecture supports a specific form of \emph{exclusion reasoning}: if a functional pathway is treated as sufficiently intact on the basis of laboratory markers, genes that are required for that pathway can be deprioritized as primary causes of disease in the current patient, subject to redundancy, pleiotropy, and measurement-quality constraints. The system is implemented as a SQLite-backed prototype with a PySide6 graphical interface and integrates public data sources (Reactome, Gene Ontology, UniProt, HGNC, Uberon, Cell Ontology).
+This architecture supports a specific form of \emph{exclusion reasoning}: if a functional pathway is judged sufficiently intact on the basis of laboratory markers, genes required for that pathway can be deprioritized as primary disease causes in the current patient, subject to redundancy, pleiotropy, and measurement-quality constraints. The system is implemented as a SQLite-backed prototype with a PySide6 graphical interface and integrates public data sources (Reactome, Gene Ontology, UniProt, HGNC, Uberon, Cell Ontology).
 
 We describe the formal exclusion model---in both binary and probabilistic variants---together with its assumptions, limitations, and validation requirements. The prototype is demonstrated on a hemolysis--immunodeficiency scenario involving five functional pathways, eleven genes, and seven laboratory markers. The system is positioned as a research tool for exploring pathway-centric exclusion logic, not as a validated clinical decision support system.
 \end{abstract}
@@ -98,7 +98,7 @@ The central observation motivating this work is:
 \emph{If a biological functional pathway is sufficiently supported as intact, then genes whose pathogenic effect would be expected to disrupt that pathway can be deprioritized as primary causes of dysfunction.}
 \end{quote}
 
-This transforms positive evidence (apparently intact pathway function) into negative diagnostic constraints (lower-priority candidate genes), potentially reducing the candidate space before more detailed differential-diagnostic reasoning is applied.
+This transforms positive evidence (apparently intact pathway function) into negative diagnostic constraints (lower-priority candidate genes), potentially reducing the candidate space before more detailed differential-diagnostic review begins.
 
 Existing systems organize knowledge differently. PhenoTips \citep{Girdea2013} and Phenomizer \citep{Kohler2009} match patient phenotypes to disease databases via the Human Phenotype Ontology \citep{Robinson2008}. These systems excel at symptom-to-disease matching but do not exploit pathway integrity as exclusion evidence. Pathway databases such as Reactome \citep{Fabregat2018} and KEGG \citep{Kanehisa2023} organize around biochemical reactions but are not designed for clinical exclusion reasoning. Gene Ontology \citep{Ashburner2000} provides fine-grained process descriptions but lacks the clinical decision framework.
 
@@ -123,7 +123,7 @@ Let $\mathcal{P} = \{p_1, \ldots, p_n\}$ be the set of biological functional pat
 
 \begin{definition}[Binary Exclusion Rule]
 \label{def:binary}
-If $s(p_i) = 1$, then $\forall\, g \in \mathcal{E}(p_i)$: gene~$g$ is marked as \emph{excluded} from the current primary-cause candidate set, provided $g$ is essential only in pathways that are all assessed as intact:
+If $s(p_i) = 1$, then $\forall\, g \in \mathcal{E}(p_i)$: gene~$g$ is flagged for \emph{exclusion} from the current primary-cause candidate set, provided $g$ is essential only in pathways that are all assessed as intact:
 \begin{equation}
     \text{excluded}(g) \iff \forall\, p_i \text{ s.t. } g \in \mathcal{E}(p_i): s(p_i) = 1
 \end{equation}
@@ -244,7 +244,7 @@ Gene & BodyLocation & \texttt{EXPRESSED\_IN} \\
 \subsection{Implementation}
 \label{sec:implementation}
 
-The prototype uses \textbf{SQLite} as the backend, with relational tables simulating a graph structure through association tables (Figure~\ref{fig:schema_sql}). The system comprises four main modules:
+The prototype uses \textbf{SQLite} as the backend, using relational and association tables to emulate graph structure (Figure~\ref{fig:schema_sql}). The system comprises four main modules:
 
 \begin{enumerate}
     \item \textbf{Ingestion module}: Downloads and parses six public data sources (Section~\ref{sec:datasources}), with a manifest-based tracking system to avoid redundant downloads.
@@ -289,7 +289,7 @@ The prototype uses \textbf{SQLite} as the backend, with relational tables simula
 \label{fig:schema_sql}
 \end{figure}
 
-A dedicated \textbf{Graph Explorer} (NetworkX-based) visualizes subgraphs with lazy-loaded neighborhoods. Graph layout is computed in a background thread to maintain GUI responsiveness. Nodes are color-coded by entity type; pathway nodes additionally display their status (intact/disrupted/unknown) through border colors.
+A dedicated \textbf{Graph Explorer} (NetworkX-based) visualizes subgraphs with on-demand neighborhood loading. Graph layout is computed in a background thread to maintain GUI responsiveness. Nodes are color-coded by entity type; pathway nodes additionally display their status (intact/disrupted/unknown) through border colors.
 
 \paragraph{Note on graph database choice.} The current SQLite implementation enables rapid prototyping but introduces known limitations for deep graph traversal (see Section~\ref{sec:limitations}). A production system would benefit from Neo4j or a comparable native graph database. The prototype demonstrates the conceptual model; performance comparisons with graph-native backends are planned.
 
@@ -327,7 +327,7 @@ Data ingestion follows a defined order (HGNC $\to$ Uberon $\to$ Cell Ontology $\
 
 \subsection{Binary Exclusion}
 
-The binary exclusion engine (Definition~\ref{def:binary}) iterates over all genes marked as essential in at least one pathway. For each gene, it retrieves all pathways where the gene is essential and checks whether \emph{all} of these pathways have status ``intact.'' If so, the gene is excluded; otherwise, it remains a candidate.
+The binary exclusion engine (Definition~\ref{def:binary}) iterates over all genes marked as essential in at least one pathway. For each gene, it retrieves all pathways in which the gene is essential and checks whether \emph{all} of those pathways are marked ``intact.'' If so, the gene is excluded; otherwise, it remains a candidate.
 
 \begin{algorithm}[H]
 \caption{Binary Exclusion Analysis}
@@ -347,7 +347,7 @@ The binary exclusion engine (Definition~\ref{def:binary}) iterates over all gene
 \end{algorithmic}
 \end{algorithm}
 
-The confidence of exclusion depends on the number of intact pathways: a gene excluded via multiple independent intact pathways has stronger evidence than one excluded via a single pathway.
+Confidence in exclusion depends on the number of intact pathways: a gene excluded via multiple independent intact pathways has stronger support than one excluded via a single pathway.
 
 \subsection{Probabilistic Exclusion}
 
@@ -602,7 +602,7 @@ The core hypothesis---that pathway exclusion reduces the candidate gene space by
 % ================================================================
 \section*{Data and Software Availability}
 
-The prototype source code, including database schema, ingestion pipelines, exclusion engines, and GUI application, is available at \url{https://github.com/research-line/system-medicine}. The system integrates exclusively public data sources; no patient data is used or required.
+The prototype source code, including database schema, ingestion pipelines, exclusion engines, and GUI application, is available in the \href{https://github.com/research-line/system-medicine}{public GitHub repository}. The system integrates exclusively public data sources; no patient data is used or required.
 
 % ================================================================
 \section*{AI Disclosure}

@@ -37,7 +37,7 @@
     urlcolor=blue!70!black,
     pdftitle={Funktionaler Pathway-zentrierter medizinischer Wissensgraph mit Ausschlusslogik},
     pdfauthor={Lukas Geiger},
-    pdfsubject={Systemmedizinisches Konzeptpapier zur Pathway-zentrierten Ausschlusslogik fuer die Differentialdiagnoseforschung},
+    pdfsubject={Systemmedizinisches Konzeptpapier zur Pathway-zentrierten Ausschlusslogik f\"ur die Differentialdiagnoseforschung},
     pdfkeywords={Wissensgraph, Differentialdiagnose, funktionelle Pathways, Ausschlusslogik, Systemmedizin, Reactome, Gene Ontology},
 }
 
@@ -79,7 +79,7 @@ Wir stellen den Entwurf und die prototypische Implementierung eines funktionalen
 
 Diese Architektur unterst"utzt eine spezifische Form des \emph{ausschlussbasierten Schlie{\ss}ens}: Wenn ein funktioneller Pathway auf Basis von Laborwerten als hinreichend intakt gilt, k"onnen Gene, die f"ur diesen Pathway erforderlich sind, als prim"are Krankheitsursachen beim aktuellen Patienten zur"uckgestuft werden, vorbehaltlich von Redundanz, Pleiotropie und Einschr"ankungen der Messqualit"at. Das System ist als SQLite-gest"utzter Prototyp mit einer grafischen PySide6-Oberfl"ache implementiert und integriert "offentliche Datenquellen (Reactome, Gene Ontology, UniProt, HGNC, Uberon, Cell Ontology).
 
-Wir beschreiben das formale Ausschlussmodell -- sowohl in bin"arer als auch in probabilistischer Variante -- seine Annahmen und Einschr"ankungen und schlagen ein Validierungsframework vor. Der Prototyp wird an einem H"amolyse-Immundefizienz-Szenario demonstriert, das f"unf funktionelle Pathways, elf Gene und sieben Labormarker umfasst. Das System ist als Forschungswerkzeug zur Erkundung einer Pathway-zentrierten Ausschlusslogik positioniert, nicht als validiertes klinisches Entscheidungsunterst"utzungssystem.
+Wir beschreiben das formale Ausschlussmodell in bin"arer und probabilistischer Variante, seine Annahmen und Einschr"ankungen und schlagen einen Validierungsrahmen vor. Der Prototyp wird an einem H"amolyse-Immundefizienz-Szenario demonstriert, das f"unf funktionelle Pathways, elf Gene und sieben Labormarker umfasst. Das System ist als Forschungswerkzeug zur Erkundung einer Pathway-zentrierten Ausschlusslogik positioniert, nicht als validiertes klinisches Entscheidungsunterst"utzungssystem.
 \end{abstract}
 
 \smallskip
@@ -98,9 +98,9 @@ Die zentrale Beobachtung, die diese Arbeit motiviert, lautet:
 \emph{Wenn ein biologischer funktioneller Pathway durch die vorliegenden Daten hinreichend als intakt gest"utzt ist, dann k"onnen Gene, deren pathogene Wirkung diesen Pathway voraussichtlich st"oren w"urde, als prim"are Ursachen einer Funktionsst"orung zur"uckgestuft werden.}
 \end{quote}
 
-Dies transformiert positive Evidenz (offenbar intakte Pathway-Funktion) in negative diagnostische Einschr"ankungen (niedriger priorisierte Kandidatengene) und kann so den Kandidatenraum verkleinern, bevor eine detailliertere differentialdiagnostische Pr"ufung erfolgt.
+Dies transformiert positive Evidenz (offenbar intakte Pathway-Funktion) in negative diagnostische Einschr"ankungen (geringer priorisierte Kandidatengene) und kann so den Kandidatenraum verkleinern, bevor eine detailliertere differentialdiagnostische Pr"ufung erfolgt.
 
-Bestehende Systeme organisieren Wissen unterschiedlich. PhenoTips \citep{Girdea2013} und Phenomizer \citep{Kohler2009} gleichen Patientenph"anotypen "uber die Human Phenotype Ontology \citep{Robinson2008} mit Krankheitsdatenbanken ab. Diese Systeme sind hervorragend im Symptom-Krankheits-Abgleich, nutzen aber nicht die Pathway-Integrit"at als Ausschlussbeleg. Pathway-Datenbanken wie Reactome \citep{Fabregat2018} und KEGG \citep{Kanehisa2023} organisieren sich um biochemische Reaktionen, sind aber nicht f"ur ausschlussbasiertes klinisches Schlie{\ss}en konzipiert. Gene Ontology \citep{Ashburner2000} liefert feingranulare Prozessbeschreibungen, es fehlt jedoch der klinische Entscheidungsrahmen.
+Bestehende Systeme organisieren Wissen unterschiedlich. PhenoTips \citep{Girdea2013} und Phenomizer \citep{Kohler2009} gleichen Patientenph"anotypen "uber die Human Phenotype Ontology \citep{Robinson2008} mit Krankheitsdatenbanken ab. Diese Systeme sind hervorragend im Symptom-Krankheits-Abgleich, nutzen aber nicht die Pathway-Integrit"at als Ausschlussevidenz. Pathway-Datenbanken wie Reactome \citep{Fabregat2018} und KEGG \citep{Kanehisa2023} organisieren sich um biochemische Reaktionen, sind aber nicht f"ur ausschlussbasiertes klinisches Schlie{\ss}en konzipiert. Gene Ontology \citep{Ashburner2000} liefert feingranulare Prozessbeschreibungen, es fehlt jedoch der klinische Entscheidungsrahmen.
 
 Das vorgeschlagene System schlie{\ss}t diese L"ucke, indem es funktionelle Pathways als \emph{prim"are Entit"aten} in einem Wissensgraphen behandelt, wobei alle anderen biomedizinischen Konzepte -- Gene, anatomische Lokalisationen, Zelltypen, Labormarker und Diagnosen -- als sekund"are Annotationen angebunden werden. Diese strukturelle Entscheidung macht das Schlie{\ss}en "uber den Pathway-Status explizit und rechnerisch handhabbar, ohne die biologisch interpretierbare Zwischenschicht zu verlieren.
 
@@ -108,9 +108,9 @@ Das vorgeschlagene System schlie{\ss}t diese L"ucke, indem es funktionelle Pathw
 
 \begin{enumerate}
     \item Ein \textbf{Datenmodell}, das funktionelle Pathways als zentrales Ordnungsprinzip f"ur klinisches Schlie{\ss}en verwendet und sechs Entit"atstypen "uber semantisch typisierte Kanten verkn"upft.
-    \item Ein \textbf{formales Ausschlussframework} mit sowohl bin"arer als auch probabilistischer Variante, das die systematische Priorisierung und Zur"uckstufung von Kandidatengenen auf Basis von Pathway-Integrit"atsevidenz erm"oglicht.
+    \item Ein \textbf{formaler Ausschlussrahmen} mit sowohl bin"arer als auch probabilistischer Variante, der die systematische Priorisierung und Zur"uckstufung von Kandidatengenen auf Basis von Pathway-Integrit"atsevidenz erm"oglicht.
     \item Eine \textbf{prototypische Implementierung} mit Datenaufnahme aus sechs "offentlichen biologischen Datenbanken, einem interaktiven Graphen-Explorer und einer Diagnoseabfrage-Engine.
-    \item Ein \textbf{Validierungsframework}, das Metriken, Benchmark-Anforderungen und Vergleichskriterien zur Bewertung des Ansatzes spezifiziert.
+    \item Ein \textbf{Validierungsrahmen}, der Metriken, Benchmark-Anforderungen und Vergleichskriterien zur Bewertung des Ansatzes spezifiziert.
 \end{enumerate}
 
 % ================================================================
@@ -289,7 +289,7 @@ Der Prototyp verwendet \textbf{SQLite} als Backend, wobei relationale Tabellen e
 \label{fig:schema_sql}
 \end{figure}
 
-Ein dedizierter \textbf{Graph Explorer} (NetworkX-basiert) visualisiert Teilgraphen mit lazy-geladenen Nachbarschaften. Das Graph-Layout wird in einem Hintergrund-Thread berechnet, um die GUI-Responsivit"at zu erhalten. Knoten sind nach Entit"atstyp farbcodiert; Pathway-Knoten zeigen zus"atzlich ihren Status (intakt/gest"ort/unbekannt) durch Randfarben an.
+Ein dedizierter \textbf{Graph Explorer} (NetworkX-basiert) visualisiert Teilgraphen mit bei Bedarf nachgeladenen Nachbarschaften. Das Graph-Layout wird in einem Hintergrund-Thread berechnet, um die GUI-Responsivit"at zu erhalten. Knoten sind nach Entit"atstyp farbcodiert; Pathway-Knoten zeigen zus"atzlich ihren Status (intakt/gest"ort/unbekannt) durch Randfarben an.
 
 \paragraph{Hinweis zur Wahl der Graphdatenbank.} Die aktuelle SQLite-Implementierung erm"oglicht schnelles Prototyping, f"uhrt aber zu bekannten Einschr"ankungen bei tiefer Graphtraversierung (siehe Abschnitt~\ref{sec:limitations}). Ein Produktivsystem w"urde von Neo4j oder einer vergleichbaren nativen Graphdatenbank profitieren. Der Prototyp demonstriert das konzeptuelle Modell; Leistungsvergleiche mit graphnativen Backends sind geplant.
 
@@ -602,7 +602,7 @@ Die Kernhypothese -- dass Pathway-Ausschluss den Kandidatengenraum um $\geq 30\,
 % ================================================================
 \section*{Daten- und Softwareverf"ugbarkeit}
 
-Der Quellcode des Prototyps, einschlie{\ss}lich Datenbankschema, Aufnahmepipelines, Ausschluss-Engines und GUI-Anwendung, ist verf"ugbar unter \url{https://github.com/research-line/system-medicine}. Das System integriert ausschlie{\ss}lich "offentliche Datenquellen; es werden keine Patientendaten verwendet oder ben"otigt.
+Der Quellcode des Prototyps, einschlie{\ss}lich Datenbankschema, Aufnahmepipelines, Ausschluss-Engines und GUI-Anwendung, ist im \href{https://github.com/research-line/system-medicine}{\"offentlichen GitHub-Repository} verf\"ugbar. Das System integriert ausschlie{\ss}lich \"offentliche Datenquellen; es werden keine Patientendaten verwendet oder ben\"otigt.
 
 % ================================================================
 \section*{KI-Nutzungserkl"arung}
