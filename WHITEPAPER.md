@@ -6,7 +6,7 @@
 **Author:** Lukas Geiger, Independent Researcher, Bernau, Germany
 **Date:** March 2026
 **Status:** DRAFT -- Concept Paper v0.4
-**Prototype:** Available at [github.com/research-line/system-medicine](https://github.com/research-line/system-medicine)
+**Prototype:** Available at [github.com/um-bruch/system-medicine](https://github.com/um-bruch/system-medicine)
 
 ---
 

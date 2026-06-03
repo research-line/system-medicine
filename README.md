@@ -45,7 +45,7 @@ System-Medizin models the human body as a network of **functional pathways** (bi
 ### Installation
 
 ```bash
-git clone https://github.com/research-line/system-medicine.git
+git clone https://github.com/um-bruch/system-medicine.git
 cd system-medicine
 pip install -r requirements.txt
 ```
