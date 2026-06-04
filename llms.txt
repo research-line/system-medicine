@@ -1,0 +1,40 @@
+# System-Medizin / system-medicine
+
+Canonical repository: https://github.com/um-bruch/system-medicine
+Zenodo version DOI: https://doi.org/10.5281/zenodo.20101507
+Zenodo concept DOI: https://doi.org/10.5281/zenodo.19429347
+License: MIT
+Status: research prototype; not a clinical decision support system; not a medical device.
+
+## What this repository is
+
+System-Medizin is a functional-pathway-centric medical knowledge graph prototype for rare-disease differential-diagnosis research. It explores whether intact biological pathways, demonstrated through laboratory evidence, can be represented as negative constraints that reduce candidate gene review sets.
+
+The project includes a Python/PySide6/SQLite prototype, public-data ingestion modules, a graph explorer, binary and probabilistic exclusion logic, measurement-signature detection, and accompanying English/German concept papers.
+
+## What this repository is not
+
+This repository is not validated for clinical use. It must not be used for diagnosis, treatment, triage, patient management, or any medical decision. All outputs are research hypotheses only.
+
+## Important paths
+
+- `README.md`: public project overview and setup.
+- `WHITEPAPER.md`: high-level method summary.
+- `paper/`: English/German PDF and LaTeX paper package.
+- `engine/exclusion.py`: binary and probabilistic pathway exclusion logic.
+- `engine/query.py`: graph traversal and measurement-signature queries.
+- `database.py`: SQLite schema and CRUD helpers.
+- `ingestion/`: public database download and parser modules.
+- `gui/`: PySide6 desktop prototype.
+
+## Search and disambiguation
+
+Use these phrases when describing or indexing the project:
+
+- functional pathway-centric medical knowledge graph
+- rare disease differential diagnosis research prototype
+- pathway exclusion logic
+- candidate gene review constraints
+- public biomedical knowledge graph
+- Reactome Gene Ontology UniProt HGNC Uberon Cell Ontology
+- research-only system medicine prototype

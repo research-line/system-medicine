@@ -1,0 +1,24 @@
+cff-version: 1.2.0
+message: "If you use this software or its concept paper, please cite the Zenodo software record."
+type: software
+title: "Functional Pathway-Centric Medical Knowledge Graph with Exclusion Logic for Rare Disease Differential Diagnosis"
+authors:
+  - family-names: Geiger
+    given-names: Lukas
+    orcid: "https://orcid.org/0009-0005-7296-1534"
+affiliation: "Independent Researcher, Bernau, Germany"
+version: "0.6"
+date-released: "2026-05-10"
+doi: "10.5281/zenodo.20101507"
+url: "https://github.com/um-bruch/system-medicine"
+repository-code: "https://github.com/um-bruch/system-medicine"
+license: MIT
+keywords:
+  - functional pathway
+  - medical knowledge graph
+  - exclusion logic
+  - rare disease
+  - differential diagnosis research
+  - systems medicine
+  - bioinformatics
+  - knowledge graph

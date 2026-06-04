@@ -1,24 +1,34 @@
-# System-Medizin
+# System-Medizin (System Medicine)
 
 [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.19429347.svg)](https://doi.org/10.5281/zenodo.19429347)
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 [![Python 3.10+](https://img.shields.io/badge/Python-3.10%2B-blue.svg)](https://www.python.org/)
 [![PySide6](https://img.shields.io/badge/GUI-PySide6-green.svg)](https://doc.qt.io/qtforpython/)
 
-A **functional-pathway-centric medical knowledge graph** with exclusion logic for differential diagnosis support.
+A **functional-pathway-centric medical knowledge graph** for rare-disease differential-diagnosis research, pathway exclusion logic, and auditable biomedical graph reasoning.
 
-> **Research tool only.** This is not a clinical decision support system and must not be used for medical decisions.
+> **Research tool only.** This is not a clinical decision support system, not a medical device, and must not be used for diagnosis, treatment, triage, or any other medical decision.
 
 > **Note on project status:** We are currently unable to actively develop this software and concept further due to time constraints. We would be happy if someone picks this up and are glad to support anyone who does. Feel free to fork, open issues, or reach out.
+
+## Start Here
+
+| Need | Open |
+|------|------|
+| Understand the research idea | [`WHITEPAPER.md`](WHITEPAPER.md) |
+| Cite the software record | [Zenodo v0.6](https://doi.org/10.5281/zenodo.20101507) / [concept DOI](https://doi.org/10.5281/zenodo.19429347) |
+| Inspect the implementation | [`engine/`](engine/) and [`database.py`](database.py) |
+| Run the prototype | `python main.py`, then load demo data in the setup wizard |
+| Machine-readable repo context | [`llms.txt`](llms.txt) |
 
 ## What is System-Medizin?
 
 System-Medizin models the human body as a network of **functional pathways** (biological processes) linked through genes, proteins, laboratory values, anatomical locations, cell types, and clinical diagnoses. Instead of isolated symptom matching, the graph-based approach enables:
 
-- **Exclusion Logic:** If a functional pathway is demonstrated intact (via normal lab markers), all genes essential for that pathway can be excluded as primary disease causes.
+- **Exclusion Logic:** If a functional pathway is demonstrated intact in a research scenario, genes essential for that pathway can be marked as lower-priority candidate causes under explicit assumptions.
 - **Probabilistic Analysis:** Confidence scores for gene exclusion based on pathway evidence, redundancy, and multi-pathway reinforcement.
-- **Pattern Detection:** Automatic recognition of known measurement signatures (e.g., hemolysis, lupus, sepsis, Cushing's).
-- **Diagnostic Queries:** From abnormal measurements via suspect pathways to candidate genes and recommended follow-up tests.
+- **Pattern Detection:** Automatic recognition of known measurement signatures (e.g. hemolysis, lupus, sepsis, Cushing's).
+- **Diagnostic Research Queries:** From abnormal measurements via suspect pathways to candidate genes and research-only follow-up hypotheses.
 
 ## Data Coverage (v0.4)
 
@@ -33,7 +43,7 @@ System-Medizin models the human body as a network of **functional pathways** (bi
 | Cell Types | 25 |
 | Graph Edges | 696 |
 
-**Covered domains:** Hematology, Hepatology, Nephrology, Endocrinology (Thyroid, HPA axis, Gonads, PTH), Immunology (Complement, T-cells, NK-cells, IgE/Allergy), Cardiology, Oncology markers, Blood gas analysis, Rheumatology, Hemostasis (incl. Thrombophilia, Fibrinolysis), Pulmonology, Gastroenterology (IBD, Celiac, Pancreatic insufficiency), Infectiology (Hepatitis serology), Autoimmunology (Hashimoto, Graves', PBC, AIH), Urine diagnostics, Neurology markers, Osteology, Copper metabolism, Allergology.
+**Covered domains:** Hematology, hepatology, nephrology, endocrinology (thyroid, HPA axis, gonads, PTH), immunology (complement, T-cells, NK-cells, IgE/allergy), cardiology, oncology markers, blood gas analysis, rheumatology, hemostasis (including thrombophilia and fibrinolysis), pulmonology, gastroenterology (IBD, celiac, pancreatic insufficiency), infectiology (hepatitis serology), autoimmunology (Hashimoto, Graves', PBC, AIH), urine diagnostics, neurology markers, osteology, copper metabolism, and allergology.
 
 ## Getting Started
 
@@ -62,7 +72,7 @@ On first launch a **Setup Wizard** appears. Click "Load Demo Data" to populate a
 
 ## Architecture
 
-```
+```text
 system-medicine/
   main.py              # Entry point
   config.py            # Paths, data sources, colors
@@ -117,11 +127,23 @@ This tool integrates exclusively **public, open-access** biological databases:
 
 The formal exclusion model (binary and probabilistic variants), assumptions, limitations, and validation framework are described in the accompanying concept paper:
 
-> Geiger, L. (2026). *Functional Pathway-Centric Medical Knowledge Graph with Exclusion Logic for Rare Disease Differential Diagnosis.* See `paper/` directory.
+> Geiger, L. (2026). *Functional Pathway-Centric Medical Knowledge Graph with Exclusion Logic for Rare Disease Differential Diagnosis.* Zenodo v0.6. https://doi.org/10.5281/zenodo.20101507
+
+The `paper/` directory contains the English, German, and combined PDF/LaTeX package. `CITATION.cff` contains the recommended citation metadata for GitHub and citation tools.
+
+## Search Context
+
+Useful discovery phrases for this repository:
+
+- functional pathway-centric medical knowledge graph
+- rare disease differential diagnosis research prototype
+- pathway exclusion logic for candidate gene review
+- public biomedical knowledge graph with Reactome, Gene Ontology, UniProt, HGNC, Uberon, and Cell Ontology
+- research-only PySide6 and SQLite system medicine prototype
 
 ## Contributing
 
-Contributions are welcome! Areas where help is especially valued:
+Contributions are welcome. Areas where help is especially valued:
 
 - **Pathway expansion:** Adding new functional pathways with gene/measurement links
 - **OMIM/HPO integration:** Connecting disease-gene associations from OMIM and phenotype data from HPO
@@ -136,9 +158,9 @@ MIT License -- see [LICENSE](LICENSE).
 
 ## Disclaimer
 
-This software is a **research prototype** for exploring pathway-centric exclusion logic. It is **not validated for clinical use** and must not be used for medical diagnosis or treatment decisions. Always consult qualified healthcare professionals.
+This software is a **research prototype** for exploring pathway-centric exclusion logic. It is **not validated for clinical use** and must not be used for diagnosis, treatment, triage, patient management, or any other medical decision. Always consult qualified healthcare professionals.
 
-> ⚠️ **Rechtlicher Hinweis / Legal Notice**
+> **Rechtlicher Hinweis / Legal Notice**
 >
 > Dieses Projekt ist **kein Medizinprodukt** im Sinne der MDR (EU) 2017/745 / IVDR (EU) 2017/746. Es ist **nicht klinisch validiert**, **nicht durch BfArM oder eine Benannte Stelle geprüft**, **nicht zertifiziert**. Es verarbeitet Daten ausschließlich zu Forschungs- und Softwareentwicklungszwecken. Eine klinische oder diagnostische Nutzung ist ausdrücklich **nicht** die Zweckbestimmung. Entscheidungen über Diagnose und Therapie bleiben qualifizierten Fachpersonen vorbehalten.
 >
