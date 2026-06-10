@@ -5,6 +5,7 @@ Zenodo version DOI: https://doi.org/10.5281/zenodo.20101507
 Zenodo concept DOI: https://doi.org/10.5281/zenodo.19429347
 License: MIT
 Status: research prototype; not a clinical decision support system; not a medical device.
+Last-checked: 2026-06-10
 
 ## What this repository is
 

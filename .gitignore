@@ -22,6 +22,7 @@ paper/*.fls
 paper/*.fdb_latexmk
 paper/*.synctex.gz
 paper/extracted_*.txt
+paper/.designcheck_render/
 
 # Internal planning documents
 Plan.txt

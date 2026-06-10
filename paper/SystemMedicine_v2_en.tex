@@ -1,5 +1,8 @@
 \documentclass[12pt,a4paper]{article}
 
+\input{glyphtounicode}
+\pdfgentounicode=1
+
 % === Packages ===
 \usepackage[utf8]{inputenc}
 \usepackage[T1]{fontenc}
@@ -26,7 +29,7 @@
 
 \newcolumntype{Y}{>{\raggedright\arraybackslash}X}
 \emergencystretch=2em
-\providecommand*{\HyperDestNameFilter}[1]{en.#1}
+\renewcommand*{\HyperDestNameFilter}[1]{en.#1}
 
 % === Hyperref config ===
 \hypersetup{
