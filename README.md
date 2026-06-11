@@ -4,6 +4,7 @@
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 [![Python 3.10+](https://img.shields.io/badge/Python-3.10%2B-blue.svg)](https://www.python.org/)
 [![PySide6](https://img.shields.io/badge/GUI-PySide6-green.svg)](https://doc.qt.io/qtforpython/)
+[![System Medicine smoke tests](https://github.com/um-bruch/system-medicine/actions/workflows/tests.yml/badge.svg)](https://github.com/um-bruch/system-medicine/actions/workflows/tests.yml)
 
 A **functional-pathway-centric medical knowledge graph** for rare-disease differential-diagnosis research, pathway exclusion logic, and auditable biomedical graph reasoning.
 
@@ -19,6 +20,7 @@ A **functional-pathway-centric medical knowledge graph** for rare-disease differ
 | Cite the software record | [Zenodo v0.6](https://doi.org/10.5281/zenodo.20101507) / [concept DOI](https://doi.org/10.5281/zenodo.19429347) |
 | Inspect the implementation | [`engine/`](engine/) and [`database.py`](database.py) |
 | Run the prototype | `python main.py`, then load demo data in the setup wizard |
+| Check source health | `python -m compileall -q engine ingestion gui main.py database.py config.py` and `python -m pytest -q` |
 | Machine-readable repo context | [`llms.txt`](llms.txt) |
 
 ## What is System-Medizin?

@@ -8,6 +8,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Added
+- Added a GitHub Actions smoke-test workflow for Python 3.10, 3.11, and 3.12.
+- Added in-memory core smoke tests for database schema setup, exclusion logic, probabilistic ranking, and measurement-to-pathway queries.
 - Added Unicode character support configuration (`glyphtounicode`) to English and German LaTeX source papers to fix rendering/copying artifacts in compiled PDFs.
 - Added `CHANGELOG.md` for project history and release tracking.
 
