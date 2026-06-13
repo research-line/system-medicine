@@ -70,7 +70,7 @@
     Unabhängiger Forscher, Bernau, Deutschland\\
     ORCID: \url{https://orcid.org/0009-0005-7296-1534}
 }
-\date{Mai 2026}
+\date{Juni 2026}
 
 \begin{document}
 
@@ -550,6 +550,29 @@ Eine rigorose Validierung erfordert einen kuratierten Benchmark von 20--50 best"
 \end{enumerate}
 
 Zielquellen umfassen Register f"ur seltene Erkrankungen (EURORDIS), klinische Synopsen aus OMIM und publizierte Fallserien mit umfassenden Laboruntersuchungen.
+
+\subsection{Evaluations-Gate-Ledger}
+
+Das Evaluationsproblem ist kein einzelner Genauigkeitswert. Demonstrationsdaten, synthetische Stresstests, Realfall-Benchmarks, zeitliche Gültigkeit, Provenienz und externe Vergleichssysteme beantworten unterschiedliche Fragen. Tabelle~\ref{tab:evaluation-gates} trennt diese Ebenen, damit ein positives Ergebnis in einer Schicht nicht als Validierung einer anderen Schicht überlesen wird.
+
+\begin{table}[H]
+\centering
+\caption{Evaluationsgates für die Validierung von Pathway-Zertifikaten.}
+\label{tab:evaluation-gates}
+\scriptsize
+\begin{tabularx}{\textwidth}{@{}YYYY@{}}
+\toprule
+\textbf{Gate} & \textbf{Minimales Datenobjekt} & \textbf{Pass-/Hold-Regel} & \textbf{Verhinderter Überclaim} \\
+\midrule
+Demonstrations-Seed & Kuratierter Hämolyse-Immundefizienz-Teilgraph mit manuell gesetzten Pathway-Statuswerten & Erwartete Kandidatenreduktionslogik wird reproduziert und plausible Krankheitsgene bleiben erhalten & Keine Schätzung klinischer Leistungsfähigkeit \\
+Synthetische Stresstests & Eingepflanztes ursächliches Gen, simulierte Laborstörung und bekannte interne Grundwahrheit & Das ursächliche Gen wird nie ausgeschlossen; nicht-ursächliche Gene werden nur bei tragender Pathway-Logik zurückgestuft & Kein Ersatz für Realfallvalidierung \\
+Realfall-Benchmark & 20--50 bestätigte seltene Erkrankungsfälle mit Laborprofilen vor der genetischen Diagnose & CRR $\geq 0{,}30$ bei Falschausschlussrate $=0$ & Kein autonomer Diagnoseclaim \\
+Temporales Zertifikatsgate & Altersfenster, Krankheitsstadium, Beobachtungszeitpunkt und Gültigkeitshorizont je Pathway-Zertifikat & Harter Ausschluss ist nur im gültigen Zeitfenster erlaubt; sonst ist Review erforderlich & Keine zeitlose Ausschlussregel \\
+Provenienz und Evidenzstufe & Quellenkennung, Evidenzspanne, Datenbankversion und Konfidenzstufe je Pathway-Statusclaim & Jedes beibehaltene oder ausgeschlossene Gen ist auf explizite Quellevidenz rückführbar & Keine quellenfreie Graphinferenz \\
+Comparator Suite & Derselbe Fallsatz für HPO/Phenomizer und reproduzierbare Rare-Disease-KG- oder Embedding-Baselines & Zusatznutzen gegenüber HPO-only-Filterung und aktuellen Baselines wird sichtbar & Kein isolierter Benchmarkclaim \\
+\bottomrule
+\end{tabularx}
+\end{table}
 
 \subsection{Prim"are Metrik}
 

@@ -70,7 +70,7 @@
     Independent Researcher, Bernau, Germany\\
     ORCID: \url{https://orcid.org/0009-0005-7296-1534}
 }
-\date{May 2026}
+\date{June 2026}
 
 \begin{document}
 
@@ -550,6 +550,29 @@ A rigorous validation requires a curated benchmark of 20--50 confirmed genetic d
 \end{enumerate}
 
 Target sources include rare disease registries (EURORDIS), OMIM clinical synopsis entries, and published case series with comprehensive laboratory workups.
+
+\subsection{Evaluation-Gate Ledger}
+
+The evaluation problem is not a single accuracy score. Demonstration data, synthetic stress tests, real patient benchmarks, temporal validity, provenance, and external comparators answer different questions. Table~\ref{tab:evaluation-gates} separates these layers so that a positive result in one layer is not overread as validation in another.
+
+\begin{table}[H]
+\centering
+\caption{Evaluation gates for pathway-certificate validation.}
+\label{tab:evaluation-gates}
+\scriptsize
+\begin{tabularx}{\textwidth}{@{}YYYY@{}}
+\toprule
+\textbf{Gate} & \textbf{Minimum data object} & \textbf{Pass / hold rule} & \textbf{Overclaim prevented} \\
+\midrule
+Demonstration seed & Curated hemolysis--immunodeficiency subgraph with manually assigned pathway states & Expected candidate-reduction logic is reproduced and plausible disease genes are retained & No clinical performance estimate \\
+Synthetic stress tests & Planted causal gene, simulated laboratory perturbation, and known internal ground truth & The causal gene is never excluded; non-causal genes are deprioritized only when the pathway logic warrants it & No replacement for real-case validation \\
+Real-case benchmark & 20--50 confirmed rare-disease cases with pre-diagnosis laboratory profiles & CRR $\geq 0.30$ with false-exclusion rate $=0$ & No autonomous diagnostic claim \\
+Temporal certificate gate & Age window, disease stage, observation time, and validity horizon for each pathway certificate & Hard exclusion is allowed only inside the certificate's valid time window; otherwise review is required & No timeless exclusion rule \\
+Provenance and evidence tier & Source identifier, evidence span, database version, and confidence tier for each pathway-status claim & Each retained or excluded gene is traceable to explicit source evidence & No source-free graph inference \\
+Comparator suite & Same case set evaluated with HPO/Phenomizer and reproducible rare-disease KG or embedding baselines & Added value over HPO-only filtering and current baseline systems is visible & No isolated benchmark claim \\
+\bottomrule
+\end{tabularx}
+\end{table}
 
 \subsection{Primary Metric}
 
