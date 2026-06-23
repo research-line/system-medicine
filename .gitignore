@@ -26,6 +26,7 @@ paper/.designcheck_render/
 
 # Internal planning documents
 Plan.txt
+LOCK*.txt
 KONZEPT.md
 AKTIONSPLAN.md
 PUBLIKATIONSPLAN.md
@@ -53,3 +54,6 @@ _private/
 *BRIEFING*
 CORE.txt
 removed_sections/
+*-ASUS-GEI*
+*-WORKSTATION-LG*
+_tmp_stylecheck_*.txt

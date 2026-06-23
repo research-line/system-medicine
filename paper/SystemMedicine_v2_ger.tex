@@ -40,7 +40,7 @@
     urlcolor=blue!70!black,
     pdftitle={Funktionaler Pathway-zentrierter medizinischer Wissensgraph mit Ausschlusslogik},
     pdfauthor={Lukas Geiger},
-    pdfsubject={Systemmedizinisches Konzeptpapier zur Pathway-zentrierten Ausschlusslogik f\"ur die Differentialdiagnoseforschung},
+    pdfsubject={Systemmedizinisches Konzeptpapier zur Pathway-zentrierten Ausschlusslogik für die Differentialdiagnoseforschung},
     pdfkeywords={Wissensgraph, Differentialdiagnose, funktionelle Pathways, Ausschlusslogik, Systemmedizin, Reactome, Gene Ontology},
 }
 
@@ -78,42 +78,42 @@
 
 % ================================================================
 \begin{abstract}
-Wir stellen den Entwurf und die prototypische Implementierung eines funktionalen Pathway-zentrierten medizinischen Wissensgraphen f"ur die Differentialdiagnoseforschung vor. Herk"ommliche klinische Entscheidungsunterst"utzungssysteme organisieren Wissen um Diagnosen, Symptome oder Gene als prim"are Entit"aten. Im Gegensatz dazu verwendet das vorgeschlagene System \emph{biologische funktionelle Pathways} als zentrales Ordnungsprinzip, wobei Gene, Proteine, Laborwerte, anatomische Lokalisationen, Zelltypen und klinische Diagnosen als sekund"are Annotationen verkn"upft werden.
+Wir stellen den Entwurf und die prototypische Implementierung eines funktionalen Pathway-zentrierten medizinischen Wissensgraphen für die Differentialdiagnoseforschung vor. Herkömmliche klinische Entscheidungsunterstützungssysteme organisieren Wissen um Diagnosen, Symptome oder Gene als primäre Entitäten. Im Gegensatz dazu verwendet das vorgeschlagene System \emph{biologische funktionelle Pathways} als zentrales Ordnungsprinzip, wobei Gene, Proteine, Laborwerte, anatomische Lokalisationen, Zelltypen und klinische Diagnosen als sekundäre Annotationen verknüpft werden.
 
-Diese Architektur unterst"utzt eine spezifische Form des \emph{ausschlussbasierten Schlie{\ss}ens}: Wenn ein funktioneller Pathway auf Basis von Laborwerten als hinreichend intakt gilt, k"onnen Gene, die f"ur diesen Pathway erforderlich sind, als prim"are Krankheitsursachen beim aktuellen Patienten zur"uckgestuft werden, vorbehaltlich von Redundanz, Pleiotropie und Einschr"ankungen der Messqualit"at. Das System ist als SQLite-gest"utzter Prototyp mit einer grafischen PySide6-Oberfl"ache implementiert und integriert "offentliche Datenquellen (Reactome, Gene Ontology, UniProt, HGNC, Uberon, Cell Ontology).
+Diese Architektur unterstützt eine spezifische Form des \emph{ausschlussbasierten Schließens}: Wenn ein funktioneller Pathway auf Basis von Laborwerten als hinreichend intakt gilt, können Gene, die für diesen Pathway erforderlich sind, als primäre Krankheitsursachen beim aktuellen Patienten zurückgestuft werden, vorbehaltlich von Redundanz, Pleiotropie und Einschränkungen der Messqualität. Das System ist als SQLite-gestützter Prototyp mit einer grafischen PySide6-Oberfläche implementiert und integriert öffentliche Datenquellen (Reactome, Gene Ontology, UniProt, HGNC, Uberon, Cell Ontology).
 
-Wir beschreiben das formale Ausschlussmodell in bin"arer und probabilistischer Variante, seine Annahmen und Einschr"ankungen und schlagen einen Validierungsrahmen vor. Der Prototyp wird an einem H"amolyse-Immundefizienz-Szenario demonstriert, das f"unf funktionelle Pathways, elf Gene und sieben Labormarker umfasst. Das System ist als Forschungswerkzeug zur Erkundung einer Pathway-zentrierten Ausschlusslogik positioniert, nicht als validiertes klinisches Entscheidungsunterst"utzungssystem.
+Wir beschreiben das formale Ausschlussmodell in binärer und probabilistischer Variante, seine Annahmen und Einschränkungen und schlagen einen Validierungsrahmen vor. Der Prototyp wird an einem Hämolyse-Immundefizienz-Szenario demonstriert, das fünf funktionelle Pathways, elf Gene und sieben Labormarker umfasst. Das System ist als Forschungswerkzeug zur Erkundung einer Pathway-zentrierten Ausschlusslogik positioniert, nicht als validiertes klinisches Entscheidungsunterstützungssystem.
 \end{abstract}
 
 \smallskip
-\noindent\textbf{Schl"usselw"orter:} Wissensgraph, Differentialdiagnose, funktionelle Pathways, Ausschlusslogik, Systemmedizin, Reactome, Gene Ontology
+\noindent\textbf{Schlüsselwörter:} Wissensgraph, Differentialdiagnose, funktionelle Pathways, Ausschlusslogik, Systemmedizin, Reactome, Gene Ontology
 \clearpage
 
 % ================================================================
 \section{Einleitung und Motivation}
 \label{sec:introduction}
 
-Die Differentialdiagnose bei komplexen Multisystemerkrankungen scheitert h"aufig nicht am Mangel an Daten, sondern an der Unf"ahigkeit, heterogene Evidenz systematisch zu integrieren. Ein Patient mit abnormalen Laborwerten kann Hunderte genetischer Kandidatenursachen haben; aktuelle klinische Werkzeuge pr"asentieren diese gr"o{\ss}tenteils als Ranglisten, ohne die logische Struktur \emph{ausgeschlossener} M"oglichkeiten auszunutzen.
+Die Differentialdiagnose bei komplexen Multisystemerkrankungen scheitert häufig nicht am Mangel an Daten, sondern an der Unfähigkeit, heterogene Evidenz systematisch zu integrieren. Ein Patient mit abnormalen Laborwerten kann Hunderte genetischer Kandidatenursachen haben; aktuelle klinische Werkzeuge präsentieren diese größtenteils als Ranglisten, ohne die logische Struktur \emph{ausgeschlossener} Möglichkeiten auszunutzen.
 
 Die zentrale Beobachtung, die diese Arbeit motiviert, lautet:
 
 \begin{quote}
-\emph{Wenn ein biologischer funktioneller Pathway durch die vorliegenden Daten hinreichend als intakt gest"utzt ist, dann k"onnen Gene, deren pathogene Wirkung diesen Pathway voraussichtlich st"oren w"urde, als prim"are Ursachen einer Funktionsst"orung zur"uckgestuft werden.}
+\emph{Wenn ein biologischer funktioneller Pathway durch die vorliegenden Daten hinreichend als intakt gestützt ist, dann können Gene, deren pathogene Wirkung diesen Pathway voraussichtlich stören würde, als primäre Ursachen einer Funktionsstörung zurückgestuft werden.}
 \end{quote}
 
-Dies transformiert positive Evidenz (offenbar intakte Pathway-Funktion) in negative diagnostische Einschr"ankungen (geringer priorisierte Kandidatengene) und kann so den Kandidatenraum verkleinern, bevor eine detailliertere differentialdiagnostische Pr"ufung erfolgt.
+Dies transformiert positive Evidenz (offenbar intakte Pathway-Funktion) in negative diagnostische Einschränkungen (geringer priorisierte Kandidatengene) und kann so den Kandidatenraum verkleinern, bevor eine detailliertere differentialdiagnostische Prüfung erfolgt.
 
-Bestehende Systeme organisieren Wissen unterschiedlich. PhenoTips \citep{Girdea2013} und Phenomizer \citep{Kohler2009} gleichen Patientenph"anotypen "uber die Human Phenotype Ontology \citep{Robinson2008} mit Krankheitsdatenbanken ab. Diese Systeme sind hervorragend im Symptom-Krankheits-Abgleich, nutzen aber nicht die Pathway-Integrit"at als Ausschlussevidenz. Pathway-Datenbanken wie Reactome \citep{Fabregat2018} und KEGG \citep{Kanehisa2023} organisieren sich um biochemische Reaktionen, sind aber nicht f"ur ausschlussbasiertes klinisches Schlie{\ss}en konzipiert. Gene Ontology \citep{Ashburner2000} liefert feingranulare Prozessbeschreibungen, es fehlt jedoch der klinische Entscheidungsrahmen.
+Bestehende Systeme organisieren Wissen unterschiedlich. PhenoTips \citep{Girdea2013} und Phenomizer \citep{Kohler2009} gleichen Patientenphänotypen über die Human Phenotype Ontology \citep{Robinson2008} mit Krankheitsdatenbanken ab. Diese Systeme sind hervorragend im Symptom-Krankheits-Abgleich, nutzen aber nicht die Pathway-Integrität als Ausschlussevidenz. Pathway-Datenbanken wie Reactome \citep{Fabregat2018} und KEGG \citep{Kanehisa2023} organisieren sich um biochemische Reaktionen, sind aber nicht für ausschlussbasiertes klinisches Schließen konzipiert. Gene Ontology \citep{Ashburner2000} liefert feingranulare Prozessbeschreibungen, es fehlt jedoch der klinische Entscheidungsrahmen.
 
-Das vorgeschlagene System schlie{\ss}t diese L"ucke, indem es funktionelle Pathways als \emph{prim"are Entit"aten} in einem Wissensgraphen behandelt, wobei alle anderen biomedizinischen Konzepte -- Gene, anatomische Lokalisationen, Zelltypen, Labormarker und Diagnosen -- als sekund"are Annotationen angebunden werden. Diese strukturelle Entscheidung macht das Schlie{\ss}en "uber den Pathway-Status explizit und rechnerisch handhabbar, ohne die biologisch interpretierbare Zwischenschicht zu verlieren.
+Das vorgeschlagene System schließt diese Lücke, indem es funktionelle Pathways als \emph{primäre Entitäten} in einem Wissensgraphen behandelt, wobei alle anderen biomedizinischen Konzepte -- Gene, anatomische Lokalisationen, Zelltypen, Labormarker und Diagnosen -- als sekundäre Annotationen angebunden werden. Diese strukturelle Entscheidung macht das Schließen über den Pathway-Status explizit und rechnerisch handhabbar, ohne die biologisch interpretierbare Zwischenschicht zu verlieren.
 
-\subsection{Beitr"age}
+\subsection{Beiträge}
 
 \begin{enumerate}
-    \item Ein \textbf{Datenmodell}, das funktionelle Pathways als zentrales Ordnungsprinzip f"ur klinisches Schlie{\ss}en verwendet und sechs Entit"atstypen "uber semantisch typisierte Kanten verkn"upft.
-    \item Ein \textbf{formaler Ausschlussrahmen} mit sowohl bin"arer als auch probabilistischer Variante, der die systematische Priorisierung und Zur"uckstufung von Kandidatengenen auf Basis von Pathway-Integrit"atsevidenz erm"oglicht.
-    \item Eine \textbf{prototypische Implementierung} mit Datenaufnahme aus sechs "offentlichen biologischen Datenbanken, einem interaktiven Graphen-Explorer und einer Diagnoseabfrage-Engine.
-    \item Ein \textbf{Validierungsrahmen}, der Metriken, Benchmark-Anforderungen und Vergleichskriterien zur Bewertung des Ansatzes spezifiziert.
+    \item Ein \textbf{Datenmodell}, das funktionelle Pathways als zentrales Ordnungsprinzip für klinisches Schließen verwendet und sechs Entitätstypen über semantisch typisierte Kanten verknüpft.
+    \item Ein \textbf{formaler Ausschlussrahmen} mit sowohl binärer als auch probabilistischer Variante, der die systematische Priorisierung und Zurückstufung von Kandidatengenen auf Basis von Pathway-Integritätsevidenz ermöglicht.
+    \item Eine \textbf{prototypische Implementierung} mit Datenaufnahme aus sechs öffentlichen biologischen Datenbanken, einem interaktiven Graphen-Explorer und einer Diagnoseabfrage-Engine.
+    \item Ein \textbf{Validierungsrahmen}, der Metriken, Anforderungen an den Benchmark und Vergleichskriterien zur Bewertung des Ansatzes spezifiziert.
 \end{enumerate}
 
 % ================================================================
@@ -122,11 +122,11 @@ Das vorgeschlagene System schlie{\ss}t diese L"ucke, indem es funktionelle Pathw
 
 \subsection{Formale Problemstellung}
 
-Sei $\mathcal{P} = \{p_1, \ldots, p_n\}$ die Menge der biologischen funktionellen Pathways f"ur einen gegebenen Patientenkontext. Sei $\mathcal{G}$ die Menge der Kandidatengene. Sei $\mathcal{E}(p_i) \subseteq \mathcal{G}$ die Menge der f"ur Pathway~$p_i$ \emph{essentiellen} Gene. Sei $s(p_i) \in \{0, 1\}$ der beobachtete Pathway-Status: $1 = \text{intakt}$, $0 = \text{gest"ort oder unbekannt}$.
+Sei $\mathcal{P} = \{p_1, \ldots, p_n\}$ die Menge der biologischen funktionellen Pathways für einen gegebenen Patientenkontext. Sei $\mathcal{G}$ die Menge der Kandidatengene. Sei $\mathcal{E}(p_i) \subseteq \mathcal{G}$ die Menge der für Pathway~$p_i$ \emph{essentiellen} Gene. Sei $s(p_i) \in \{0, 1\}$ der beobachtete Pathway-Status: $1 = \text{intakt}$, $0 = \text{gestört oder unbekannt}$.
 
-\begin{definition}[Bin"are Ausschlussregel]
+\begin{definition}[Binäre Ausschlussregel]
 \label{def:binary}
-Wenn $s(p_i) = 1$, dann gilt $\forall\, g \in \mathcal{E}(p_i)$: Gen~$g$ ist im aktuellen Kandidatenset f"ur prim"are Krankheitsursachen als \emph{ausgeschlossen} markiert, sofern $g$ nur in Pathways essentiell ist, die alle intakt sind:
+Wenn $s(p_i) = 1$, dann gilt $\forall\, g \in \mathcal{E}(p_i)$: Gen~$g$ ist im aktuellen Kandidatenset für primäre Krankheitsursachen als \emph{ausgeschlossen} markiert, sofern $g$ nur in Pathways essentiell ist, die alle intakt sind:
 \begin{equation}
     \text{excluded}(g) \iff \forall\, p_i \text{ s.t. } g \in \mathcal{E}(p_i): s(p_i) = 1
 \end{equation}
@@ -134,15 +134,15 @@ Wenn $s(p_i) = 1$, dann gilt $\forall\, g \in \mathcal{E}(p_i)$: Gen~$g$ ist im 
 
 \begin{definition}[Probabilistischer Ausschlusswert]
 \label{def:probabilistic}
-F"ur ein Gen~$g$ ist die Ausschlusskonfi\-denz:
+Für ein Gen~$g$ ist die Ausschlusskonfi\-denz:
 \begin{equation}
     \text{excl}(g) = \prod_{i:\, g \in \mathcal{E}(p_i)} c(p_i) \cdot b(g)
 \end{equation}
-wobei $c(p_i) \in [0,1]$ die Pathway-Statuskonfidenz ist (intakt: $0{,}95$, unbekannt: $0{,}50$, gest"ort: $0{,}05$) und $b(g) \in [0,1]$ ein Multi-Pathway-Bonusfaktor:
+wobei $c(p_i) \in [0,1]$ die Pathway-Statuskonfidenz ist (intakt: $0{,}95$, unbekannt: $0{,}50$, gestört: $0{,}05$) und $b(g) \in [0,1]$ ein Multi-Pathway-Bonusfaktor:
 \begin{equation}
     b(g) = \min\!\Big(1.0,\; 0.7 + 0.1 \cdot |\{p_i : g \in \mathcal{E}(p_i) \wedge s(p_i) = 1\}|\Big)
 \end{equation}
-Der \emph{Verdachtswert} ber"ucksichtigt die Genredundanz:
+Der \emph{Verdachtswert} berücksichtigt die Genredundanz:
 \begin{equation}
     \text{susp}(g) = \big(1 - \text{excl}(g)\big) \cdot r(g)
 \end{equation}
@@ -152,10 +152,10 @@ wobei $r(g) \in \{1.0, 0.85, 0.6, 0.3\}$ den Redundanzgrad des Gens abbildet (ke
 \subsection{Kernhypothese}
 
 \begin{quote}
-\emph{Pathway-statusbasierte Ausschlusslogik reduziert die Kandidatengenmenge bei komplexen seltenen Erkrankungen systematisch um mindestens 30\,\% gegen"uber rein ph"anotypbasierter Filterung, wenn sie auf einem kuratierten Benchmark-Datensatz evaluiert wird.}
+\emph{Ausschlusslogik auf Basis des Pathway-Status reduziert die Kandidatengenmenge bei komplexen seltenen Erkrankungen systematisch um mindestens 30\,\% gegenüber rein phänotypbasierter Filterung, wenn sie auf einem kuratierten Benchmark-Datensatz evaluiert wird.}
 \end{quote}
 
-Dies ist eine spezifische, falsifizierbare Hypothese. Die 30\,\%-Schwelle ist als minimale klinisch bedeutsame Reduktion gesetzt; ein Nullergebnis ($<10\,\%$ Reduktion) w"urde darauf hinweisen, dass die Ausschlusslogik "uber bestehende Werkzeuge hinaus wenig diagnostischen Mehrwert bietet.
+Dies ist eine spezifische, falsifizierbare Hypothese. Die 30\,\%-Schwelle ist als minimale klinisch bedeutsame Reduktion gesetzt; ein Nullergebnis ($<10\,\%$ Reduktion) würde darauf hinweisen, dass die Ausschlusslogik über bestehende Werkzeuge hinaus wenig diagnostischen Mehrwert bietet.
 
 Die Kandidatenreduktionsrate (CRR) ist definiert als:
 \begin{equation}
@@ -170,7 +170,7 @@ Die Kandidatenreduktionsrate (CRR) ist definiert als:
 \subsection{Datenmodell}
 \label{sec:datamodel}
 
-Die zentrale Entit"at ist der \textbf{FunctionalPathway}-Knoten, der einen diskreten biologischen Prozess mit beobachtbaren Ein- und Ausgaben repr"asentiert. Abbildung~\ref{fig:schema} zeigt das vollst"andige Datenmodell.
+Die zentrale Entität ist der \textbf{FunctionalPathway}-Knoten, der einen diskreten biologischen Prozess mit beobachtbaren Ein- und Ausgaben repräsentiert. Abbildung~\ref{fig:schema} zeigt das vollständige Datenmodell.
 
 \begin{figure}[H]
 \centering
@@ -185,7 +185,7 @@ Die zentrale Entit"at ist der \textbf{FunctionalPathway}-Knoten, der einen diskr
     \node[entity, fill=blue!20] (pathway) {Funktions-\\pfad};
 
     % Surrounding nodes
-    \node[entity, fill=green!20, above left=2cm and 3cm of pathway] (location) {K\"orper-\\ort};
+    \node[entity, fill=green!20, above left=2cm and 3cm of pathway] (location) {Körper-\\region};
     \node[entity, fill=orange!20, above right=2cm and 3cm of pathway] (cell) {Zelltyp};
     \node[entity, fill=red!20, below left=2cm and 3cm of pathway] (gene) {Gen /\\Protein};
     \node[entity, fill=purple!20, below right=2cm and 3cm of pathway] (measurement) {Messwert};
@@ -208,22 +208,22 @@ Die zentrale Entit"at ist der \textbf{FunctionalPathway}-Knoten, der einen diskr
         node[edge_label, below, sloped, pos=0.35] {MEASURED\_AT} (location.south east);
 \end{tikzpicture}
 }
-\caption{Entity-Relationship-Diagramm des Pathway-zentrierten Wissensgraphen. Durchgezogene Pfeile zeigen prim"are Beziehungen "uber den Pathway-Hub; gestrichelte Pfeile zeigen sekund"are Querverbindungen.}
+\caption{Entity-Relationship-Diagramm des Pathway-zentrierten Wissensgraphen. Durchgezogene Pfeile zeigen primäre Beziehungen über den Pathway-Hub; gestrichelte Pfeile zeigen sekundäre Querverbindungen.}
 \label{fig:schema}
 \end{figure}
 
-Jeder Entit"atstyp tr"agt dom"anenspezifische Attribute:
+Jeder Entitätstyp trägt domänenspezifische Attribute:
 
 \begin{itemize}
-    \item \textbf{FunctionalPathway}: Name, Beschreibung, prim"are Ausgabe, Zeitklasse (akut oder chronisch), Status (intakt, gest"ort oder unbekannt) und externe ID (Reactome/GO).
+    \item \textbf{FunctionalPathway}: Name, Beschreibung, primäre Ausgabe, Zeitklasse (akut oder chronisch), Status (intakt, gestört oder unbekannt) und externe ID (Reactome/GO).
     \item \textbf{BodyLocation} (Uberon): Organ, Subkompartiment, Zirkulationstyp, Immunrolle.
-    \item \textbf{CellType} (Cell Ontology): Linie, Reifungsstadium, Lebensdauer, Mobilit"at.
+    \item \textbf{CellType} (Cell Ontology): Linie, Reifungsstadium, Lebensdauer, Mobilität.
     \item \textbf{Gene/Protein} (HGNC/UniProt): Symbol, Funktionstyp (strukturell, regulatorisch, signalgebend, metabolisch), Redundanzgrad, Expressionsorte.
-    \item \textbf{MeasurementType}: Name, LOINC-Code, Referenzbereich, Messort, Sensitivit"at, Spezifit"at.
+    \item \textbf{MeasurementType}: Name, LOINC-Code, Referenzbereich, Messort, Sensitivität, Spezifität.
     \item \textbf{ClinicalDiagnosis}: Name, ICD-10-Code, Beschreibung.
 \end{itemize}
 
-Kantentypen tragen semantische Bezeichnungen (Tabelle~\ref{tab:edges}) und bei Gen-Pathway-Kanten ein \texttt{is\_essential}-Flag, das modulatorische von essentiellen Genbeitr"agen unterscheidet.
+Kantentypen tragen semantische Bezeichnungen (Tabelle~\ref{tab:edges}) und bei Gen-Pathway-Kanten ein \texttt{is\_essential}-Flag, das modulatorische von essentiellen Genbeiträgen unterscheidet.
 
 \begin{table}[H]
 \centering
@@ -247,13 +247,13 @@ Gene & BodyLocation & \texttt{EXPRESSED\_IN} \\
 \subsection{Implementierung}
 \label{sec:implementation}
 
-Der Prototyp verwendet \textbf{SQLite} als Backend, wobei relationale Tabellen eine Graphstruktur "uber Assoziationstabellen simulieren (Abbildung~\ref{fig:schema_sql}). Das System umfasst vier Hauptmodule:
+Der Prototyp verwendet \textbf{SQLite} als Backend, wobei relationale Tabellen eine Graphstruktur über Assoziationstabellen simulieren (Abbildung~\ref{fig:schema_sql}). Das System umfasst vier Hauptmodule:
 
 \begin{enumerate}
-    \item \textbf{Importmodul}: L"adt sechs "offentliche Datenquellen herunter und parst sie (Abschnitt~\ref{sec:datasources}), mit einem manifestbasierten Tracking-System zur Vermeidung redundanter Downloads.
-    \item \textbf{Engine-Modul}: Implementiert die Ausschlusslogik (bin"ar und probabilistisch), Graphtraversierungsabfragen, Mustererkennung f"ur Messwert-Signaturen und die Erzeugung menschenlesbarer Erkl"arungen.
-    \item \textbf{GUI-Modul}: Eine PySide6-basierte Desktop-Anwendung mit vier Tabs: Graph Explorer (interaktive Netzwerkvisualisierung "uber NetworkX), Ausschluss-Panel (Pathway-Statusverwaltung und -analyse), Diagnoseabfrage (messwertgesteuerte Hypothesengenerierung) und Datenbrowser (Inspektion von Rohdaten-Tabellen).
-    \item \textbf{Datenbankmodul}: Schemadefinition, CRUD-Hilfsfunktionen und Kantenverkn"upfungsfunktionen mit Fremdschl"usselconstraints.
+    \item \textbf{Importmodul}: Lädt sechs öffentliche Datenquellen herunter und parst sie (Abschnitt~\ref{sec:datasources}), mit einem manifestbasierten Tracking-System zur Vermeidung redundanter Downloads.
+    \item \textbf{Engine-Modul}: Implementiert die Ausschlusslogik (binär und probabilistisch), Graphtraversierungsabfragen, Mustererkennung für Messwert-Signaturen und die Erzeugung menschenlesbarer Erklärungen.
+    \item \textbf{GUI-Modul}: Eine PySide6-basierte Desktop-Anwendung mit vier Tabs: Graph Explorer (interaktive Netzwerkvisualisierung über NetworkX), Ausschluss-Panel (Pathway-Statusverwaltung und -analyse), Diagnoseabfrage (messwertgesteuerte Hypothesengenerierung) und Datenbrowser (Inspektion von Rohdaten-Tabellen).
+    \item \textbf{Datenbankmodul}: Schemadefinition, CRUD-Hilfsfunktionen und Kantenverknüpfungsfunktionen mit Fremdschlüsselconstraints.
 \end{enumerate}
 
 \begin{figure}[H]
@@ -288,18 +288,18 @@ Der Prototyp verwendet \textbf{SQLite} als Backend, wobei relationale Tabellen e
     \draw[->] (pd) -- (fp);
     \draw[->] (pd) -- (dg);
 \end{tikzpicture}
-\caption{Relationales SQLite-Schema. Graue K"asten sind Entit"atstabellen; blaue K"asten sind Assoziations-(Kanten-)Tabellen mit Fremdschl"usseln.}
+\caption{Relationales SQLite-Schema. Graue Kästen sind Entitätstabellen; blaue Kästen sind Assoziations-(Kanten-)Tabellen mit Fremdschlüsseln.}
 \label{fig:schema_sql}
 \end{figure}
 
-Ein dedizierter \textbf{Graph Explorer} (NetworkX-basiert) visualisiert Teilgraphen mit bei Bedarf nachgeladenen Nachbarschaften. Das Graph-Layout wird in einem Hintergrund-Thread berechnet, um die GUI-Responsivit"at zu erhalten. Knoten sind nach Entit"atstyp farbcodiert; Pathway-Knoten zeigen zus"atzlich ihren Status (intakt/gest"ort/unbekannt) durch Randfarben an.
+Ein dedizierter \textbf{Graph Explorer} (NetworkX-basiert) visualisiert Teilgraphen mit bei Bedarf nachgeladenen Nachbarschaften. Das Layout des Graphen wird in einem Hintergrund-Thread berechnet, um die GUI-Responsivität zu erhalten. Knoten sind nach Entitätstyp farbcodiert; Pathway-Knoten zeigen zusätzlich ihren Status (intakt/gestört/unbekannt) durch Randfarben an.
 
-\paragraph{Hinweis zur Wahl der Graphdatenbank.} Die aktuelle SQLite-Implementierung erm"oglicht schnelles Prototyping, f"uhrt aber zu bekannten Einschr"ankungen bei tiefer Graphtraversierung (siehe Abschnitt~\ref{sec:limitations}). Ein Produktivsystem w"urde von Neo4j oder einer vergleichbaren nativen Graphdatenbank profitieren. Der Prototyp demonstriert das konzeptuelle Modell; Leistungsvergleiche mit graphnativen Backends sind geplant.
+\paragraph{Hinweis zur Wahl der Graphdatenbank.} Die aktuelle SQLite-Implementierung ermöglicht schnelles Prototyping, führt aber zu bekannten Einschränkungen bei tiefer Graphtraversierung (siehe Abschnitt~\ref{sec:limitations}). Ein Produktivsystem würde von Neo4j oder einer vergleichbaren nativen Graphdatenbank profitieren. Der Prototyp demonstriert das konzeptuelle Modell; Leistungsvergleiche mit graphnativen Backends sind geplant.
 
 \subsection{Datenquellen}
 \label{sec:datasources}
 
-Das System integriert sechs "offentliche biologische Datenbanken, die jeweils einen spezifischen Entit"atstyp zum Wissensgraphen beitragen:
+Das System integriert sechs öffentliche biologische Datenbanken, die jeweils einen spezifischen Entitätstyp zum Wissensgraphen beitragen:
 
 \begin{table}[H]
 \centering
@@ -308,7 +308,7 @@ Das System integriert sechs "offentliche biologische Datenbanken, die jeweils ei
 \small
 \begin{tabularx}{\textwidth}{@{}YYll@{}}
 \toprule
-\textbf{Quelle} & \textbf{Entit"atstyp} & \textbf{Format} & \textbf{Status} \\
+\textbf{Quelle} & \textbf{Entitätstyp} & \textbf{Format} & \textbf{Status} \\
 \midrule
 Reactome \citep{Fabregat2018} & Pathways, Reaktionen & TSV & Integriert \\
 Gene Ontology \citep{Ashburner2000} & Biologische Prozesse & OBO, GAF & Integriert \\
@@ -322,25 +322,25 @@ OMIM \citep{Amberger2019} / HPO \citep{Robinson2008} & Krankheits-Gen-Links & --
 \end{tabularx}
 \end{table}
 
-Die Datenaufnahme folgt einer definierten Reihenfolge (HGNC $\to$ Uberon $\to$ Cell Ontology $\to$ UniProt $\to$ Reactome $\to$ GO), um Fremdschl"usselabh"angigkeiten zu erf"ullen. Jede Quelle wird "uber eine Manifestdatei verfolgt, die Download-Zeitstempel, SHA-256-Pr"ufsummen und Importstatus aufzeichnet.
+Die Datenaufnahme folgt einer definierten Reihenfolge (HGNC $\to$ Uberon $\to$ Cell Ontology $\to$ UniProt $\to$ Reactome $\to$ GO), um Fremdschlüsselabhängigkeiten zu erfüllen. Jede Quelle wird über eine Manifestdatei verfolgt, die Download-Zeitstempel, SHA-256-Prüfsummen und Importstatus aufzeichnet.
 
 % ================================================================
 \section{Ausschlusslogik}
 \label{sec:exclusion}
 
-\subsection{Bin"arer Ausschluss}
+\subsection{Binärer Ausschluss}
 
-Die bin"are Ausschluss-Engine (Definition~\ref{def:binary}) iteriert "uber alle Gene, die in mindestens einem Pathway als essentiell markiert sind. F"ur jedes Gen werden alle Pathways abgerufen, in denen das Gen essentiell ist, und es wird gepr"uft, ob \emph{alle} dieser Pathways den Status "`intakt"' haben. Ist dies der Fall, wird das Gen ausgeschlossen; andernfalls bleibt es ein Kandidat.
+Die binäre Ausschluss-Engine (Definition~\ref{def:binary}) iteriert über alle Gene, die in mindestens einem Pathway als essentiell markiert sind. Für jedes Gen werden alle Pathways abgerufen, in denen das Gen essentiell ist, und es wird geprüft, ob \emph{alle} dieser Pathways den Status "`intakt"' haben. Ist dies der Fall, wird das Gen ausgeschlossen; andernfalls bleibt es ein Kandidat.
 
 \begin{algorithm}[H]
-\caption{Bin"are Ausschlussanalyse}
+\caption{Binäre Ausschlussanalyse}
 \label{alg:binary}
 \begin{algorithmic}[1]
 \Require Menge von Pathways $\mathcal{P}$ mit Status $s(p_i)$, essentielle Gen-Zuordnung $\mathcal{E}$
 \Ensure Mengen $\mathcal{G}_{\text{excluded}}$, $\mathcal{G}_{\text{candidate}}$
 \State $\mathcal{I} \gets \{p_i \in \mathcal{P} : s(p_i) = \text{intakt}\}$
 \ForAll{$g \in \bigcup_{p \in \mathcal{P}} \mathcal{E}(p)$} \Comment{Alle essentiellen Gene}
-    \State $P_g \gets \{p \in \mathcal{P} : g \in \mathcal{E}(p)\}$ \Comment{Pathways, die $g$ ben"otigen}
+    \State $P_g \gets \{p \in \mathcal{P} : g \in \mathcal{E}(p)\}$ \Comment{Pathways, die $g$ benötigen}
     \If{$P_g \subseteq \mathcal{I}$ \textbf{und} $P_g \neq \emptyset$}
         \State $\mathcal{G}_{\text{excluded}} \gets \mathcal{G}_{\text{excluded}} \cup \{g\}$
     \Else
@@ -350,39 +350,39 @@ Die bin"are Ausschluss-Engine (Definition~\ref{def:binary}) iteriert "uber alle 
 \end{algorithmic}
 \end{algorithm}
 
-Die Konfidenz des Ausschlusses h"angt von der Anzahl intakter Pathways ab: Ein Gen, das "uber mehrere unabh"angige intakte Pathways ausgeschlossen wird, hat st"arkere Evidenz als eines, das "uber einen einzelnen Pathway ausgeschlossen wird.
+Die Konfidenz des Ausschlusses hängt von der Anzahl intakter Pathways ab: Ein Gen, das über mehrere unabhängige intakte Pathways ausgeschlossen wird, hat stärkere Evidenz als eines, das über einen einzelnen Pathway ausgeschlossen wird.
 
 \subsection{Probabilistischer Ausschluss}
 
-Die probabilistische Engine (Definition~\ref{def:probabilistic}) erweitert das bin"are Modell durch Zuweisung kontinuierlicher Konfidenzwerte. Drei Faktoren tragen bei:
+Die probabilistische Engine (Definition~\ref{def:probabilistic}) erweitert das binäre Modell durch Zuweisung kontinuierlicher Konfidenzwerte. Drei Faktoren tragen bei:
 
 \begin{enumerate}
-    \item \textbf{Pathway-Evidenz}: Jeder Pathway-Status wird auf einen Konfidenzwert abgebildet (intakt: $0{,}95$, unbekannt: $0{,}50$, gest"ort: $0{,}05$). Die kombinierte Pathway-Konfidenz f"ur ein Gen ist das Produkt "uber alle seine essentiellen Pathways.
-    \item \textbf{Multi-Pathway-Bonus}: Gene, die in mehreren intakten Pathways essentiell sind, erhalten einen Bonusfaktor, der die st"arkere Evidenz aus unabh"angigen Quellen widerspiegelt.
+    \item \textbf{Pathway-Evidenz}: Jeder Pathway-Status wird auf einen Konfidenzwert abgebildet (intakt: $0{,}95$, unbekannt: $0{,}50$, gestört: $0{,}05$). Die kombinierte Pathway-Konfidenz für ein Gen ist das Produkt über alle seine essentiellen Pathways.
+    \item \textbf{Multi-Pathway-Bonus}: Gene, die in mehreren intakten Pathways essentiell sind, erhalten einen Bonusfaktor, der die stärkere Evidenz aus unabhängigen Quellen widerspiegelt.
     \item \textbf{Redundanzgewichtung}: Der Verdachtswert wird durch den Redundanzgrad des Gens moduliert. Gene ohne funktionelle Absicherung (Redundanz = "`keine"') erhalten volles Verdachtsgewicht ($r = 1{,}0$); hoch redundante Gene erhalten reduziertes Gewicht ($r = 0{,}3$).
 \end{enumerate}
 
-Gene werden nach Ausschlusskonfidenz kategorisiert: hoch ($\geq 0{,}8$), moderat ($0{,}3$--$0{,}8$) oder verd"achtig ($< 0{,}3$). Diese dreiteilige Klassifikation soll eine priorisierte fachliche Pr"ufung unterst"utzen, statt automatisch eine klinische Entscheidung zu erzeugen.
+Gene werden nach Ausschlusskonfidenz kategorisiert: hoch ($\geq 0{,}8$), moderat ($0{,}3$--$0{,}8$) oder verdächtig ($< 0{,}3$). Diese dreiteilige Klassifikation soll eine priorisierte fachliche Prüfung unterstützen, statt automatisch eine klinische Entscheidung zu erzeugen.
 
 \subsection{Mustererkennung}
 
-Zus"atzlich zur Ausschlusslogik implementiert das System eine \textbf{Signaturerkennung f"ur Messwerte}. Eine Signatur ist ein vordefiniertes Muster abnormaler Laborwerte (z.\,B. "`H"amolyse-Signatur"': niedriges Haptoglobin + hohes LDH + hohes indirektes Bilirubin + hohe Retikulozyten + niedriges H"amoglobin). Jede Komponente tr"agt ein Gewicht, das ihre diagnostische Bedeutung widerspiegelt.
+Zusätzlich zur Ausschlusslogik implementiert das System eine \textbf{Signaturerkennung für Messwerte}. Eine Signatur ist ein vordefiniertes Muster abnormaler Laborwerte (z.\,B. "`Hämolyse-Signatur"': niedriges Haptoglobin + hohes LDH + hohes indirektes Bilirubin + hohe Retikulozyten + niedriges Hämoglobin). Jede Komponente trägt ein Gewicht, das ihre diagnostische Bedeutung widerspiegelt.
 
-Bei einer Menge abnormaler Messwerte berechnet das System einen gewichteten "Ubereinstimmungswert gegen alle definierten Signaturen:
+Bei einer Menge abnormaler Messwerte berechnet das System einen gewichteten Übereinstimmungswert gegen alle definierten Signaturen:
 \begin{equation}
     \text{match}(S) = \frac{\sum_{c \in S_{\text{matched}}} w_c}{\sum_{c \in S_{\text{all}}} w_c}
 \end{equation}
-Signaturen mit $\text{match} \geq 0{,}3$ werden gemeldet, was eine schnelle Identifikation bekannter klinischer Muster erm"oglicht.
+Signaturen mit $\text{match} \geq 0{,}3$ werden gemeldet, was eine schnelle Identifikation bekannter klinischer Muster ermöglicht.
 
 % ================================================================
-\section{H"amolyse und Immundefizienz als Demonstration}
+\section{Hämolyse und Immundefizienz als Demonstration}
 \label{sec:demo}
 
-Der Prototyp enth"alt einen kuratierten Seed-Datensatz, der die "Uberschneidung von heredit"arer Sph"arozy\-tose, autoimmunh"amolytischer An"amie und Agammaglobulin"amie modelliert. Dieses Szenario wurde gew"ahlt, weil es mehrere interagierende Pathways mit gemeinsamen anatomischen Lokalisationen (Milz, Knochenmark) umfasst und die Ausschlusslogik "uber unabh"angige funktionelle Dom"anen hinweg demonstriert.
+Der Prototyp enthält einen kuratierten Seed-Datensatz, der die Überschneidung von hereditärer Sphärozy\-tose, autoimmunhämolytischer Anämie und Agammaglobulinämie modelliert. Dieses Szenario wurde gewählt, weil es mehrere interagierende Pathways mit gemeinsamen anatomischen Lokalisationen (Milz, Knochenmark) umfasst und die Ausschlusslogik über unabhängige funktionelle Domänen hinweg demonstriert.
 
 \subsection{Funktionelle Pathways}
 
-F"unf Pathways werden modelliert (Tabelle~\ref{tab:pathways}), die zwei klinische Dom"anen (H"amatologie und Immunologie) mit unterschiedlichen zeitlichen Charakteristiken umfassen.
+Fünf Pathways werden modelliert (Tabelle~\ref{tab:pathways}), die zwei klinische Domänen (Hämatologie und Immunologie) mit unterschiedlichen zeitlichen Charakteristiken umfassen.
 
 \begin{table}[H]
 \centering
@@ -392,34 +392,34 @@ F"unf Pathways werden modelliert (Tabelle~\ref{tab:pathways}), die zwei klinisch
 \toprule
 \textbf{Pathway} & \textbf{Ausgabe} & \textbf{Zeitlich} \\
 \midrule
-Erythrozytenmembran-Integrit"at & Stabile bikonkave Erythrozyten & Chronisch \\
-Erythrozytenabbau (H"amolyse) & Freies Hb $\to$ Bilirubin & Akut \\
+Erythrozytenmembran-Integrität & Stabile bikonkave Erythrozyten & Chronisch \\
+Erythrozytenabbau (Hämolyse) & Freies Hb $\to$ Bilirubin & Akut \\
 Milzfiltration & Entfernung defekter Zellen & Akut \\
-Fr"uhe B-Zell-Differenzierung & Funktionelle Pr"a-B-Zellen & Chronisch \\
-Antik"orperproduktion & IgG, IgM, IgA & Beides \\
+Frühe B-Zell-Differenzierung & Funktionelle Prä-B-Zellen & Chronisch \\
+Antikörperproduktion & IgG, IgM, IgA & Beides \\
 \bottomrule
 \end{tabular}
 \end{table}
 
-\subsection{Gen-Pathway-Essentialit"at}
+\subsection{Gen-Pathway-Essentialität}
 
-Elf Gene sind mit diesen Pathways verkn"upft, mit expliziten Essentialit"atsannotationen (Tabelle~\ref{tab:genes}). Das Essentialit"atsflag ist das entscheidende Attribut, das die Ausschlusslogik erm"oglicht: Nur essentielle Gene k"onnen ausgeschlossen werden, wenn ihr Pathway intakt ist.
+Elf Gene sind mit diesen Pathways verknüpft, mit expliziten Essentialitätsannotationen (Tabelle~\ref{tab:genes}). Das Essentialitätsflag ist das entscheidende Attribut, das die Ausschlusslogik ermöglicht: Nur essentielle Gene können ausgeschlossen werden, wenn ihr Pathway intakt ist.
 
 \begin{table}[H]
 \centering
-\caption{Gene und ihre Pathway-Essentialit"at im Demonstrationsszenario.}
+\caption{Gene und ihre Pathway-Essentialität im Demonstrationsszenario.}
 \label{tab:genes}
 \begin{tabular}{llll}
 \toprule
 \textbf{Gen} & \textbf{Pathway} & \textbf{Essentiell} & \textbf{Redundanz} \\
 \midrule
-ANK1 & Membranintegrit"at & Ja & Keine \\
-SLC4A1 & Membranintegrit"at & Ja & Keine \\
-SPTA1 & Membranintegrit"at & Ja & Gering \\
-SPTB & Membranintegrit"at & Ja & Keine \\
-EPB42 & Membranintegrit"at & Ja & Gering \\
-HMOX1 & H"amolyse & Ja & Gering \\
-HP & H"amolyse & Nein & Gering \\
+ANK1 & Membranintegrität & Ja & Keine \\
+SLC4A1 & Membranintegrität & Ja & Keine \\
+SPTA1 & Membranintegrität & Ja & Gering \\
+SPTB & Membranintegrität & Ja & Keine \\
+EPB42 & Membranintegrität & Ja & Gering \\
+HMOX1 & Hämolyse & Ja & Gering \\
+HP & Hämolyse & Nein & Gering \\
 BLNK & B-Zell-Differenzierung & Ja & Keine \\
 CD19 & B-Zell-Differenzierung & Ja & Keine \\
 PAX5 & B-Zell-Differenzierung & Ja & Keine \\
@@ -432,9 +432,9 @@ NOTCH2 & Milzfiltration, B-Zell-Diff. & Ja / Nein & Gering \\
 
 Betrachten wir einen Patienten mit folgenden Befunden:
 \begin{itemize}
-    \item Niedriges H"amoglobin (An"amie)
-    \item Niedriges Haptoglobin (H"amolyse-Marker)
-    \item Hohes LDH, hohes indirektes Bilirubin (H"amolyse)
+    \item Niedriges Hämoglobin (Anämie)
+    \item Niedriges Haptoglobin (Hämolyse-Marker)
+    \item Hohes LDH, hohes indirektes Bilirubin (Hämolyse)
     \item Normale B-Zell-Zahl (CD19+)
     \item Normale IgG-Spiegel
 \end{itemize}
@@ -442,90 +442,90 @@ Betrachten wir einen Patienten mit folgenden Befunden:
 Das System leitet ab:
 \begin{enumerate}
     \item Normale B-Zell-Zahl $\Rightarrow$ B-Zell-Differenzierungs-Pathway \emph{intakt} $\Rightarrow$ \textbf{Ausschluss} von BLNK, CD19, PAX5.
-    \item Normales IgG $\Rightarrow$ Antik"orperproduktions-Pathway \emph{intakt}.
-    \item H"amolyse-Marker abnormal $\Rightarrow$ H"amolyse-Pathway \emph{gest"ort}.
+    \item Normales IgG $\Rightarrow$ Antikörperproduktions-Pathway \emph{intakt}.
+    \item Hämolyse-Marker abnormal $\Rightarrow$ Hämolyse-Pathway \emph{gestört}.
     \item NOTCH2 ist essentiell in der Milzfiltration (Status unbekannt) und nicht-essentiell in der B-Zell-Differenzierung $\Rightarrow$ \textbf{bleibt Kandidat}.
-    \item Die Membrangene ANK1, SLC4A1, SPTA1, SPTB und EPB42 sind nur im Membran-Pathway essentiell. Bei unbekanntem oder gest"ortem Status $\Rightarrow$ \textbf{bleiben Kandidaten}.
+    \item Die Membrangene ANK1, SLC4A1, SPTA1, SPTB und EPB42 sind nur im Membran-Pathway essentiell. Bei unbekanntem oder gestörtem Status $\Rightarrow$ \textbf{bleiben Kandidaten}.
 \end{enumerate}
 
-Ergebnis: 3 von 10 essentiellen Genen werden zur"uckgestuft (CRR = 30\,\%), was in diesem Demonstrationsfall der Hypothesenschwelle entspricht. Die verbleibenden Kandidaten umfassen die membranstrukturellen Gene, die mit heredit"arer Sph"aro\-zytose assoziiert sind.
+Ergebnis: 3 von 10 essentiellen Genen werden zurückgestuft (CRR = 30\,\%), was in diesem Demonstrationsfall der Hypothesenschwelle entspricht. Die verbleibenden Kandidaten umfassen die membranstrukturellen Gene, die mit hereditärer Sphäro\-zytose assoziiert sind.
 
 % ================================================================
-\section{Annahmen und Einschr"ankungen}
+\section{Annahmen und Einschränkungen}
 \label{sec:limitations}
 
-\subsection{Unabh"angigkeitsannahme}
+\subsection{Unabhängigkeitsannahme}
 
-Das bin"are Ausschlussmodell nimmt an, dass Pathways \emph{funktionell unabh"angig} sind: Ein intakter Pathway~$p_i$ schlie{\ss}t seine essentiellen Gene unabh"angig vom Status anderer Pathways aus. Diese Annahme ist \textbf{bekannterma{\ss}en falsch} in vielen biologischen Kontexten:
+Das binäre Ausschlussmodell nimmt an, dass Pathways \emph{funktionell unabhängig} sind: Ein intakter Pathway~$p_i$ schließt seine essentiellen Gene unabhängig vom Status anderer Pathways aus. Diese Annahme ist \textbf{bekanntermaßen falsch} in vielen biologischen Kontexten:
 
 \begin{itemize}
-    \item Viele Gene sind in mehreren Pathways beteiligt (\emph{Pleiotropie}). Ein "uber Pathway~$p_i$ ausgeschlossenes Gen k"onnte dennoch "uber einen anderen Pathway~$p_j$, der nicht erfasst wird, urs"achlich sein. Das Modell adressiert dies, indem es verlangt, dass \emph{alle} Pathways eines Gens intakt sein m"ussen, bevor ein Ausschluss erfolgt.
-    \item Kompensationsmechanismen k"onnen die gemessenen Pathway-Ausgaben aufrechterhalten, selbst wenn ein essentielles Gen teilweise dysfunktional ist.
-    \item Der bin"are Status $s(p_i) \in \{0, 1\}$ ist eine Vereinfachung; die reale Pathway-Aktivit"at existiert auf einem Kontinuum.
+    \item Viele Gene sind in mehreren Pathways beteiligt (\emph{Pleiotropie}). Ein über Pathway~$p_i$ ausgeschlossenes Gen könnte dennoch über einen anderen Pathway~$p_j$, der nicht erfasst wird, ursächlich sein. Das Modell adressiert dies, indem es verlangt, dass \emph{alle} Pathways eines Gens intakt sein müssen, bevor ein Ausschluss erfolgt.
+    \item Kompensationsmechanismen können die gemessenen Pathway-Ausgaben aufrechterhalten, selbst wenn ein essentielles Gen teilweise dysfunktional ist.
+    \item Der binäre Status $s(p_i) \in \{0, 1\}$ ist eine Vereinfachung; die reale Pathway-Aktivität existiert auf einem Kontinuum.
 \end{itemize}
 
-Das probabilistische Modell mildert diese Einschr"ankungen teilweise durch kontinuierliche Konfidenzwerte, aber die Gewichtsparameter werden derzeit heuristisch zugewiesen.
+Das probabilistische Modell mildert diese Einschränkungen teilweise durch kontinuierliche Konfidenzwerte, aber die Gewichtsparameter werden derzeit heuristisch zugewiesen.
 
-\subsection{Definition der Essentialit"at}
+\subsection{Definition der Essentialität}
 
-"`Essentielles Gen"' ist operationell definiert als ein Gen, das in Reactome oder kuratierten Quellen als \emph{erforderlich} f"ur mindestens eine Reaktion im Pathway annotiert ist. Diese Definition ist konservativ und sollte unter Verwendung kuratierter Essentialit"atsdatenbanken (z.\,B. DepMap, CRISPR-Essentialit"atsscreens) verfeinert werden.
+"`Essentielles Gen"' ist operationell definiert als ein Gen, das in Reactome oder kuratierten Quellen als \emph{erforderlich} für mindestens eine Reaktion im Pathway annotiert ist. Diese Definition ist konservativ und sollte unter Verwendung kuratierter Essentialitätsdatenbanken (z.\,B. DepMap, CRISPR-Essentialitätsscreens) verfeinert werden.
 
 \subsection{Datenbank-Backend}
 
-Die SQLite-Implementierung gen"ugt f"ur den aktuellen Prototyp ($\sim$17\,MB Datenbank, $<$2000 Pathways), f"uhrt aber zu Einschr"ankungen bei der Vollskalierung:
+Die SQLite-Implementierung genügt für den aktuellen Prototyp ($\sim$17\,MB Datenbank, $<$2000 Pathways), führt aber zu Einschränkungen bei der Vollskalierung:
 
 \begin{itemize}
     \item Tiefe Graphtraversierungen (Tiefe $>3$) erfordern mehrfache JOIN-Operationen, die schlecht skalieren.
-    \item Keine native Unterst"utzung f"ur K"urzeste-Wege- oder Musterabgleich-Abfragen, die in Graphdatenbanken verf"ugbar sind (z.\,B. Neo4j Cypher).
+    \item Keine native Unterstützung für Kürzeste-Wege- oder Musterabgleich-Abfragen, die in Graphdatenbanken verfügbar sind (z.\,B. Neo4j Cypher).
     \item Gleichzeitiger Schreibzugriff ist durch SQLites Dateisperrung auf Dateiebene limitiert.
 \end{itemize}
 
-\subsection{Datenvollst"andigkeit}
+\subsection{Datenvollständigkeit}
 
-Nicht alle Pathways haben eine ausreichende Reactome-Abdeckung. Verwaiste Pathways, gewebespezifischer Metabolismus und k"urzlich charakterisierte Mechanismen sind m"oglicherweise nicht repr"asentiert. Die Gene-Ontology-Integration erh"oht die Breite, jedoch auf Kosten der Granularit"at -- viele GO-Begriffe f"ur biologische Prozesse sind zu generisch, um als aussagekr"aftige funktionelle Pathways zu dienen.
+Nicht alle Pathways haben eine ausreichende Reactome-Abdeckung. Verwaiste Pathways, gewebespezifischer Metabolismus und kürzlich charakterisierte Mechanismen sind möglicherweise nicht repräsentiert. Die Gene-Ontology-Integration erhöht die Breite, jedoch auf Kosten der Granularität -- viele GO-Begriffe für biologische Prozesse sind zu generisch, um als aussagekräftige funktionelle Pathways zu dienen.
 
-\subsection{EHR-Interoperabilit"at}
+\subsection{EHR-Interoperabilität}
 
-Ein praktischer Einsatz ausschlussbasierter klinischer Entscheidungsunterst"utzung erfordert die Integration mit elektronischen Gesundheitsaktensystemen (EHR), um strukturierte Laborwerte des Patienten zu erhalten. Ohne interoperablen Zugang zu Echtzeit-Laborwerten "uber Standards wie HL7 FHIR \citep{HL7FHIR2023} bleibt das System auf manuell eingegebene Messwerte beschr"ankt. EHR-Interoperabilit"at ist eine gut dokumentierte Herausforderung in der klinischen Informatik; ihre L"osung liegt au{\ss}erhalb des Rahmens dieses Konzeptpapiers, stellt aber eine kritische Anforderung f"ur jede zuk"unftige klinische Anwendung dar.
+Ein praktischer Einsatz ausschlussbasierter klinischer Entscheidungsunterstützung erfordert die Integration mit elektronischen Gesundheitsaktensystemen (EHR), um strukturierte Laborwerte des Patienten zu erhalten. Ohne interoperablen Zugang zu Echtzeit-Laborwerten über Standards wie HL7 FHIR \citep{HL7FHIR2023} bleibt das System auf manuell eingegebene Messwerte beschränkt. EHR-Interoperabilität ist eine gut dokumentierte Herausforderung in der klinischen Informatik; ihre Lösung liegt außerhalb des Rahmens dieses Konzeptpapiers, stellt aber eine kritische Anforderung für jede zukünftige klinische Anwendung dar.
 
-\subsection{Messredundanz und Kontextualit"at}
+\subsection{Messredundanz und Kontextualität}
 
-Die probabilistische Ausschlussformel (Definition~\ref{def:probabilistic}) nimmt an, dass Labormessungen unabh"angige Evidenz "uber den Pathway-Status liefern. Jedoch warnt das Contextuality-by-Default-(CbD-)Framework von Dzhafarov und Kujala \citep{Dzhafarov2016}, dass parallele Messungen informationelle Redundanz statt genuiner Unabh"angigkeit aufweisen k"onnen. Wenn zwei Laborwerte gleichzeitig abfallen, kann dies eine redundante Messung derselben Pathway-Ausgabe widerspiegeln, anstatt unabh"angige Evidenz f"ur eine gemeinsame genetische Ursache (Pleiotropie) darzustellen. Eine rigorose Behandlung w"urde einen CbD-inspirierten Korrekturterm im Ausschlusswert erfordern, der die "Uberlappung des Messkontexts ber"ucksichtigt. Diese Verfeinerung ist f"ur zuk"unftige Versionen des probabilistischen Modells geplant.
+Die probabilistische Ausschlussformel (Definition~\ref{def:probabilistic}) nimmt an, dass Labormessungen unabhängige Evidenz über den Pathway-Status liefern. Jedoch warnt das Contextuality-by-Default-(CbD-)Framework von Dzhafarov und Kujala \citep{Dzhafarov2016}, dass parallele Messungen informationelle Redundanz statt genuiner Unabhängigkeit aufweisen können. Wenn zwei Laborwerte gleichzeitig abfallen, kann dies eine redundante Messung derselben Pathway-Ausgabe widerspiegeln, anstatt unabhängige Evidenz für eine gemeinsame genetische Ursache (Pleiotropie) darzustellen. Eine rigorose Behandlung würde einen CbD-inspirierten Korrekturterm im Ausschlusswert erfordern, der die Überlappung des Messkontexts berücksichtigt. Diese Verfeinerung ist für zukünftige Versionen des probabilistischen Modells geplant.
 
 % ================================================================
 \section{Verwandte Arbeiten}
 \label{sec:related}
 
-\subsection{Ph"anotypgesteuerte Diagnoseunterst"utzung}
+\subsection{Phänotypgesteuerte Diagnoseunterstützung}
 
-Phenomizer \citep{Kohler2009} und PhenoTips \citep{Girdea2013} repr"asentieren den Stand der Technik in der ph"anotypgesteuerten Diagnose. Beide Systeme gleichen Patientenph"anotypen (HPO-Terme) mit Krankheitsdatenbanken ab und ordnen Kandidatendiagnosen nach semantischer "Ahnlichkeit. Sie sind effektiv beim Symptom-Krankheits-Abgleich, modellieren aber keine biologischen Pathways und nutzen die Pathway-Integrit"at nicht f"ur ausschlussbasiertes Schlie{\ss}en.
+Phenomizer \citep{Kohler2009} und PhenoTips \citep{Girdea2013} repräsentieren den Stand der Technik in der phänotypgesteuerten Diagnose. Beide Systeme gleichen Patientenphänotypen (HPO-Terme) mit Krankheitsdatenbanken ab und ordnen Kandidatendiagnosen nach semantischer Ähnlichkeit. Sie sind effektiv beim Symptom-Krankheits-Abgleich, modellieren aber keine biologischen Pathways und nutzen die Pathway-Integrität nicht für ausschlussbasiertes Schließen.
 
 \subsection{Pathway-Analyse in der Genomik}
 
-Gene Set Enrichment Analysis (GSEA) \citep{Subramanian2005} und verwandte Werkzeuge identifizieren dysregulierte Pathways aus Expressionsdaten. Diese Methoden arbeiten auf Populationsebene und erfordern Omics-Daten, die in der klinischen Routineversorgung typischerweise nicht verf"ugbar sind. Das vorgeschlagene System arbeitet stattdessen mit individuellen Laborwerten des Patienten und liegt damit n"aher an klinischen Standardabl"aufen, auch wenn seine klinische Anwendbarkeit noch validiert werden muss.
+Gene Set Enrichment Analysis (GSEA) \citep{Subramanian2005} und verwandte Werkzeuge identifizieren dysregulierte Pathways aus Expressionsdaten. Diese Methoden arbeiten auf Populationsebene und erfordern Omics-Daten, die in der klinischen Routineversorgung typischerweise nicht verfügbar sind. Das vorgeschlagene System arbeitet stattdessen mit individuellen Laborwerten des Patienten und liegt damit näher an klinischen Standardabläufen, auch wenn seine klinische Anwendbarkeit noch validiert werden muss.
 
-\subsection{Graphbasiertes klinisches Schlie{\ss}en}
+\subsection{Graphbasiertes klinisches Schließen}
 
-Wissensgraphen f"ur die klinische Entscheidungsunterst"utzung wurden in verschiedenen Kontexten untersucht. Klinische Wissensgraphen aus elektronischen Gesundheitsakten \citep{Rotmensch2017} erfassen statistische Assoziationen zwischen Diagnosen, Laborwerten und Behandlungen. Gro{\ss}skalige biomedizinische Wissensgraphen wie Hetionet \citep{Himmelstein2017} integrieren diverse Datenquellen f"ur Drug-Repurposing und Hypothesengenerierung. Keines dieser Systeme nutzt jedoch den Pathway-Status als prim"are Einschr"ankung in der Ausschlusslogik.
+Wissensgraphen für die klinische Entscheidungsunterstützung wurden in verschiedenen Kontexten untersucht. Klinische Wissensgraphen aus elektronischen Gesundheitsakten \citep{Rotmensch2017} erfassen statistische Assoziationen zwischen Diagnosen, Laborwerten und Behandlungen. Großskalige biomedizinische Wissensgraphen wie Hetionet \citep{Himmelstein2017} integrieren diverse Datenquellen für Drug-Repurposing und Hypothesengenerierung. Keines dieser Systeme nutzt jedoch den Pathway-Status als primäre Einschränkung in der Ausschlusslogik.
 
-\subsection{LLM-gest"utztes biomedizinisches Schlie{\ss}en}
+\subsection{LLM-gestütztes biomedizinisches Schließen}
 
-Neuere Arbeiten kombinieren gro{\ss}e Sprachmodelle mit biomedizinischen Wissensgraphen. ESCARGOT \citep{Matsumoto2025} integriert LLMs mit einer dynamischen "`Graph of Thoughts"'-Architektur und biomedizinischen Wissensgraphen f"ur Multihop-Schlussfolgerungsaufgaben. W"ahrend ESCARGOT effektives graphbasiertes Schlie{\ss}en in biomedizinischen Kontexten demonstriert, arbeitet es als Allzweck-Schlussfolgerungsagent ohne explizite Ausschlusslogik. Das vorgeschlagene System teilt die Betonung des wissensgraphgesteuerten Schlie{\ss}ens, unterscheidet sich aber grundlegend in seinem Ordnungsprinzip: funktionelle Pathways als prim"are diagnostische Einschr"ankungen statt allgemeiner Graphtraversierung.
+Neuere Arbeiten kombinieren große Sprachmodelle mit biomedizinischen Wissensgraphen. ESCARGOT \citep{Matsumoto2025} integriert LLMs mit einer dynamischen "`Graph of Thoughts"'-Architektur und biomedizinischen Wissensgraphen für Multihop-Schlussfolgerungsaufgaben. Während ESCARGOT effektives graphbasiertes Schließen in biomedizinischen Kontexten demonstriert, arbeitet es als Allzweck-Schlussfolgerungsagent ohne explizite Ausschlusslogik. Das vorgeschlagene System teilt die Betonung des wissensgraphgesteuerten Schließens, unterscheidet sich aber grundlegend in seinem Ordnungsprinzip: funktionelle Pathways als primäre diagnostische Einschränkungen statt allgemeiner Graphtraversierung.
 
-HealthGenie \citep{Gao2025} demonstriert wissensgetriebene LLM-Integration f"ur personalisierte Gesundheitsberatung. Sein Ansatz organisiert Wissensgraphen um Benutzerprofile und Ern"ahrungsempfehlungen -- eine symptomzentrierte (oder bedarfszentrierte) Organisation. Im Gegensatz dazu organisiert das vorgeschlagene System um biologische funktionelle Pathways, was eine mechanistische Ausschlusslogik erm"oglicht, die in symptomzentrierten Architekturen nicht verf"ugbar ist.
+HealthGenie \citep{Gao2025} demonstriert wissensgetriebene LLM-Integration für personalisierte Gesundheitsberatung. Sein Ansatz organisiert Wissensgraphen um Benutzerprofile und Ernährungsempfehlungen -- eine symptomzentrierte (oder bedarfszentrierte) Organisation. Im Gegensatz dazu organisiert das vorgeschlagene System um biologische funktionelle Pathways, was eine mechanistische Ausschlusslogik ermöglicht, die in symptomzentrierten Architekturen nicht verfügbar ist.
 
 \subsection{Vergleichszusammenfassung}
 
 \begin{table}[H]
 \centering
-\caption{Vergleich des vorgeschlagenen Systems mit verwandten Ans"atzen.}
+\caption{Vergleich des vorgeschlagenen Systems mit verwandten Ansätzen.}
 \label{tab:comparison}
 \begin{tabular}{lcccc}
 \toprule
-\textbf{System} & \textbf{Prim"are Entit"at} & \textbf{Ausschluss} & \textbf{Laborwerte} & \textbf{Pathways} \\
+\textbf{System} & \textbf{Primäre Entität} & \textbf{Ausschluss} & \textbf{Laborwerte} & \textbf{Pathways} \\
 \midrule
-Phenomizer & HPO-Ph"anotypen & Nein & Nein & Nein \\
-PhenoTips & Patientenph"anotypen & Nein & Begrenzt & Nein \\
+Phenomizer & HPO-Phänotypen & Nein & Nein & Nein \\
+PhenoTips & Patientenphänotypen & Nein & Begrenzt & Nein \\
 GSEA/KEGG & Pathways & Nein & Nur Omics & Ja \\
 Hetionet & Heterogen & Nein & Nein & Teilweise \\
 Klinische KGs & EHR-Daten & Nein & Ja & Nein \\
@@ -537,19 +537,19 @@ HealthGenie & KG + LLM & Nein & Nein & Nein \\
 \end{table}
 
 % ================================================================
-\section{Evaluationsframework}
+\section{Evaluationsrahmen}
 \label{sec:evaluation}
 
 \subsection{Benchmark-Datensatz}
 
-Eine rigorose Validierung erfordert einen kuratierten Benchmark von 20--50 best"atigten genetischen Diagnosen, bei denen:
+Eine rigorose Validierung erfordert einen kuratierten Benchmark von 20--50 bestätigten genetischen Diagnosen, bei denen:
 \begin{enumerate}
     \item Laborprofile des Patienten zum Zeitpunkt der Erstvorstellung (vor der genetischen Diagnose) vorliegen.
-    \item Die genetische Diagnose best"atigt ist (Variante + Ph"anotyp + funktionelle Studie).
+    \item Die genetische Diagnose bestätigt ist (Variante + Phänotyp + funktionelle Studie).
     \item Der Pathway-Status des Patienten retrospektiv aus Labordaten rekonstruiert werden kann.
 \end{enumerate}
 
-Zielquellen umfassen Register f"ur seltene Erkrankungen (EURORDIS), klinische Synopsen aus OMIM und publizierte Fallserien mit umfassenden Laboruntersuchungen.
+Zielquellen umfassen Register für seltene Erkrankungen (EURORDIS), klinische Synopsen aus OMIM und publizierte Fallserien mit umfassenden Laboruntersuchungen.
 
 \subsection{Evaluations-Gate-Ledger}
 
@@ -574,75 +574,75 @@ Comparator Suite & Derselbe Fallsatz für HPO/Phenomizer und reproduzierbare Rar
 \end{tabularx}
 \end{table}
 
-\subsection{Prim"are Metrik}
+\subsection{Primäre Metrik}
 
-Die Kandidatenreduktionsrate (CRR, Gleichung~\eqref{eq:crr}) dient als prim"ares Erfolgskriterium. Ein CRR $> 0{,}30$ unterst"utzt die Kernhypothese; ein CRR $< 0{,}10$ w"urde auf unzureichenden diagnostischen Mehrwert hinweisen.
+Die Kandidatenreduktionsrate (CRR, Gleichung~\eqref{eq:crr}) dient als primäres Erfolgskriterium. Ein CRR $> 0{,}30$ unterstützt die Kernhypothese; ein CRR $< 0{,}10$ würde auf unzureichenden diagnostischen Mehrwert hinweisen.
 
-\textbf{Sicherheitseinschr"ankung}: Das best"atigte urs"achliche Gen darf \emph{niemals} ausgeschlossen werden (Falschausschlussrate = 0). Jeder Falschausschluss im Benchmark invalidiert das Modell f"ur die klinische Anwendung.
+\textbf{Sicherheitseinschränkung}: Das bestätigte ursächliche Gen darf \emph{niemals} ausgeschlossen werden (Falschausschlussrate = 0). Jeder Falschausschluss im Benchmark invalidiert das Modell für die klinische Anwendung.
 
 \subsection{Alternative Validierung: Synthetische Patientenszenarien}
 
-Ein alternativer Validierungsweg tr"agt dem Mangel an annotierten realen Datens"atzen f"ur seltene Erkrankungen Rechnung. Synthetische Patientenszenarien k"onnen durch gezielte St"orungen im Pathway-Graphen konstruiert werden -- beispielsweise durch Simulation eines ANK1-Defekts, indem der Erythrozytenmembranintegrit"ats-Pathway auf "`gest"ort"' gesetzt wird und intern konsistente Laborwerte abgeleitet werden. Da das urs"achliche Gen \emph{a priori} definiert ist, kann die Ausschluss-Engine mit exakter interner Grundwahrheit evaluiert werden: Das System sollte nicht-urs"achliche Gene zur"uckstufen (Messung der CRR) und das eingepflanzte urs"achliche Gen beibehalten (Messung der Falschausschlussrate). Dieser Ansatz erg"anzt einen Realfall-Benchmark, kann ihn aber nicht ersetzen; er eignet sich dazu, die algorithmische Logik einem Stresstest zu unterziehen, nicht dazu, klinische Leistungsf"ahigkeit zu sch"atzen.
+Ein alternativer Validierungsweg trägt dem Mangel an annotierten realen Datensätzen für seltene Erkrankungen Rechnung. Synthetische Patientenszenarien können durch gezielte Störungen im Pathway-Graphen konstruiert werden -- beispielsweise durch Simulation eines ANK1-Defekts, indem der Erythrozytenmembranintegritäts-Pathway auf "`gestört"' gesetzt wird und intern konsistente Laborwerte abgeleitet werden. Da das ursächliche Gen \emph{a priori} definiert ist, kann die Ausschluss-Engine mit exakter interner Grundwahrheit evaluiert werden: Das System sollte nicht-ursächliche Gene zurückstufen (Messung der CRR) und das eingepflanzte ursächliche Gen beibehalten (Messung der Falschausschlussrate). Dieser Ansatz ergänzt einen Realfall-Benchmark, kann ihn aber nicht ersetzen; er eignet sich dazu, die algorithmische Logik einem Stresstest zu unterziehen, nicht dazu, klinische Leistungsfähigkeit zu schätzen.
 
-\subsection{Sekund"are Metriken}
+\subsection{Sekundäre Metriken}
 
 \begin{itemize}
     \item \textbf{Rangverbesserung}: Position des korrekten Gens in der ranggeordneten Kandidatenliste nach Ausschlussfilterung.
-    \item \textbf{Abdeckung}: Prozentsatz der Benchmark-F"alle, bei denen mindestens ein Pathway anhand verf"ugbarer Labordaten bewertet werden kann.
-    \item \textbf{Vergleich}: CRR gegen"uber standardm"a{\ss}iger HPO-only-Filterung auf dem gleichen Fallsatz.
+    \item \textbf{Abdeckung}: Prozentsatz der Benchmark-Fälle, bei denen mindestens ein Pathway anhand verfügbarer Labordaten bewertet werden kann.
+    \item \textbf{Vergleich}: CRR gegenüber standardmäßiger HPO-only-Filterung auf dem gleichen Fallsatz.
 \end{itemize}
 
 % ================================================================
 \section{Diskussion}
 \label{sec:discussion}
 
-Der Pathway-zentrierte Ansatz adressiert eine strukturelle L"ucke in der aktuellen klinischen Entscheidungsunterst"utzung: die systematische Nutzung \emph{negativer Evidenz} (was nachweislich funktioniert), um den diagnostischen Raum einzuschr"anken. Dies ist konzeptionell analog zur industriellen Fehlerdiagnose, bei der funktionierende Subsysteme ganze "Aste des Fehlerbaums eliminieren.
+Der Pathway-zentrierte Ansatz adressiert eine strukturelle Lücke in der aktuellen klinischen Entscheidungsunterstützung: die systematische Nutzung \emph{negativer Evidenz} (was nachweislich funktioniert), um den diagnostischen Raum einzuschränken. Dies ist konzeptionell analog zur industriellen Fehlerdiagnose, bei der funktionierende Subsysteme ganze Äste des Fehlerbaums eliminieren.
 
 Mehrere Designentscheidungen verdienen Diskussion:
 
-\paragraph{Warum Pathways als Zentrum, nicht Gene oder Diagnosen?} Gene sind Ursachen; Diagnosen sind Folgen. Keines von beiden bietet die mechanistische Zwischenschicht, die f"ur ausschlussbasiertes Schlie{\ss}en ben"otigt wird. Pathways repr"asentieren die funktionellen Einheiten, die genetische Ursachen mit klinischen Auswirkungen verbinden, und sind damit der nat"urliche Drehpunkt f"ur sowohl Einschluss- als auch Ausschlusslogik.
+\paragraph{Warum Pathways als Zentrum, nicht Gene oder Diagnosen?} Gene sind Ursachen; Diagnosen sind Folgen. Keines von beiden bietet die mechanistische Zwischenschicht, die für ausschlussbasiertes Schließen benötigt wird. Pathways repräsentieren die funktionellen Einheiten, die genetische Ursachen mit klinischen Auswirkungen verbinden, und sind damit der natürliche Drehpunkt für sowohl Einschluss- als auch Ausschlusslogik.
 
-\paragraph{Bin"arer vs.\ probabilistischer Ausschluss.} Das bin"are Modell ist konzeptionell einfacher und leichter zu validieren (ein Gen wird entweder beibehalten oder zur"uckgestuft), kann aber keine Unsicherheit ausdr"ucken. Das probabilistische Modell erfasst abgestufte Evidenz, erfordert jedoch kalibrierte Parameter. Wir behandeln deshalb das bin"are Modell als initiales Validierungsziel und das probabilistische Modell als explorative Erweiterung.
+\paragraph{Binärer vs.\ probabilistischer Ausschluss.} Das binäre Modell ist konzeptionell einfacher und leichter zu validieren (ein Gen wird entweder beibehalten oder zurückgestuft), kann aber keine Unsicherheit ausdrücken. Das probabilistische Modell erfasst abgestufte Evidenz, erfordert jedoch kalibrierte Parameter. Wir behandeln deshalb das binäre Modell als initiales Validierungsziel und das probabilistische Modell als explorative Erweiterung.
 
-\paragraph{Skalierbarkeit.} Der aktuelle Prototyp bew"altigt das Demonstrationsszenario ($\sim$50 Knoten, $\sim$80 Kanten) ohne Leistungsprobleme. Die Skalierung auf die vollst"andige Reactome-Datenbank ($>$2400 Pathways, $>$10\,000 Reaktionen) wird Leistungstests und wahrscheinlich eine Migration zu einem Graphdatenbank-Backend erfordern.
+\paragraph{Skalierbarkeit.} Der aktuelle Prototyp bewältigt das Demonstrationsszenario ($\sim$50 Knoten, $\sim$80 Kanten) ohne Leistungsprobleme. Die Skalierung auf die vollständige Reactome-Datenbank ($>$2400 Pathways, $>$10\,000 Reaktionen) wird Leistungstests und wahrscheinlich eine Migration zu einem Graphdatenbank-Backend erfordern.
 
 % ================================================================
-\section{Fazit und zuk"unftige Arbeiten}
+\section{Fazit und zukünftige Arbeiten}
 \label{sec:conclusion}
 
-Der funktionale Pathway-zentrierte Wissensgraph repr"asentiert einen strukturell eigenst"andigen Ansatz zur Differentialdiagnoseforschung, der Pathway-Status-Evidenz als explizite diagnostische Einschr"ankungen nutzt. Die prototypische Implementierung demonstriert die Machbarkeit "uber alle Kernkomponenten hinweg: Datenaufnahme aus sechs "offentlichen Datenbanken, Graphmodellierung mit semantischen Kantentypen, bin"are und probabilistische Ausschlusslogik, Mustererkennung und interaktive Visualisierung.
+Der funktionale Pathway-zentrierte Wissensgraph repräsentiert einen strukturell eigenständigen Ansatz zur Differentialdiagnoseforschung, der Pathway-Status-Evidenz als explizite diagnostische Einschränkungen nutzt. Die prototypische Implementierung demonstriert die Machbarkeit über alle Kernkomponenten hinweg: Datenaufnahme aus sechs öffentlichen Datenbanken, Graphmodellierung mit semantischen Kantentypen, binäre und probabilistische Ausschlusslogik, Mustererkennung und interaktive Visualisierung.
 
-Die Kernhypothese -- dass Pathway-Ausschluss den Kandidatengenraum um $\geq 30\,\%$ ohne Falschausschl"usse reduziert -- ist testbar und stellt das prim"are empirische Ziel f"ur zuk"unftige Arbeiten dar.
+Die Kernhypothese -- dass Pathway-Ausschluss den Kandidatengenraum um $\geq 30\,\%$ ohne Falschausschlüsse reduziert -- ist testbar und stellt das primäre empirische Ziel für zukünftige Arbeiten dar.
 
 \subsection{Zentrale offene Aufgaben}
 
 \begin{enumerate}
-    \item \textbf{Benchmark-Datensatz}: Kuratierung von 20--50 F"allen aus Registern f"ur seltene Erkrankungen mit Laborprofilen und best"atigten genetischen Diagnosen.
-    \item \textbf{Gewichtskalibrierung}: Entwicklung einer datengetriebenen Methode zur Sch"atzung der Pathway-Konfidenzgewichte $c(p_i)$ aus Messzuverl"assigkeit und Pathway-Redundanz.
-    \item \textbf{OMIM/HPO-Integration}: Verkn"upfung von Krankheits-Gen-Assoziationen aus OMIM und HPO-Annotationen, um einen direkten Vergleich mit rein ph"anotypbasierter Filterung zu erm"oglichen.
-    \item \textbf{Graphdatenbank-Migration}: Evaluation von Neo4j oder "ahnlichen Backends f"ur Skalierbarkeit "uber den SQLite-Prototyp hinaus.
+    \item \textbf{Benchmark-Datensatz}: Kuratierung von 20--50 Fällen aus Registern für seltene Erkrankungen mit Laborprofilen und bestätigten genetischen Diagnosen.
+    \item \textbf{Gewichtskalibrierung}: Entwicklung einer datengetriebenen Methode zur Schätzung der Pathway-Konfidenzgewichte $c(p_i)$ aus Messzuverlässigkeit und Pathway-Redundanz.
+    \item \textbf{OMIM/HPO-Integration}: Verknüpfung von Krankheits-Gen-Assoziationen aus OMIM und HPO-Annotationen, um einen direkten Vergleich mit rein phänotypbasierter Filterung zu ermöglichen.
+    \item \textbf{Graphdatenbank-Migration}: Evaluation von Neo4j oder ähnlichen Backends für Skalierbarkeit über den SQLite-Prototyp hinaus.
     \item \textbf{Vergleich mit klinischen Werkzeugen}: Benchmark gegen Phenomizer auf demselben Fallsatz zur Quantifizierung des Mehrwerts der Pathway-zentrierten Ausschlusslogik.
-    \item \textbf{Temporale Modellierung}: Erweiterung des Frameworks zur Erfassung der Krankheitsprogression und zeitabhängiger Pathway-Statusänderungen.
+    \item \textbf{Temporale Modellierung}: Erweiterung des Modells zur Erfassung der Krankheitsprogression und zeitabhängiger Pathway-Statusänderungen.
 \end{enumerate}
 
 % ================================================================
-\section*{Daten- und Softwareverf"ugbarkeit}
+\section*{Daten- und Softwareverfügbarkeit}
 
-Der Quellcode des Prototyps, einschlie{\ss}lich Datenbankschema, Aufnahmepipelines, Ausschluss-Engines und GUI-Anwendung, ist im \href{https://github.com/um-bruch/system-medicine}{\"offentlichen GitHub-Repository} verf\"ugbar. Das System integriert ausschlie{\ss}lich \"offentliche Datenquellen; es werden keine Patientendaten verwendet oder ben\"otigt.
+Der Quellcode des Prototyps, einschließlich Datenbankschema, Aufnahmepipelines, Ausschluss-Engines und GUI-Anwendung, ist im \href{https://github.com/um-bruch/system-medicine}{öffentlichen GitHub-Repository} verfügbar. Das System integriert ausschließlich öffentliche Datenquellen; es werden keine Patientendaten verwendet oder benötigt.
 
 % ================================================================
-\section*{KI-Nutzungserkl"arung}
+\section*{KI-Nutzungserklärung}
 
-Bei der Erstellung dieses Manuskripts wurden KI-gest"utzte Werkzeuge
+Bei der Erstellung dieses Manuskripts wurden KI-gestützte Werkzeuge
 (Claude/Anthropic und GPT/Codex) als nicht-autorschaftliche Hilfsmittel
-eingesetzt, insbesondere f"ur Literaturorganisation, Code-Unterst"utzung,
-Textstrukturierung, "Ubersetzungshilfe, Konsistenzpr"ufung und
-LaTeX-/PDF-Qualit"atssicherung. Diese Werkzeuge hatten keine Autorenschaft,
-keine Koautorrolle, keine Danksagungsempf"angerrolle, keine Wahrheits- oder
-Ground-Truth-Funktion und keine Rolle als unabh"angige Validierungsinstanz.
+eingesetzt, insbesondere für Literaturorganisation, Code-Unterstützung,
+Textstrukturierung, Übersetzungshilfe, Konsistenzprüfung und
+LaTeX-/PDF-Qualitätssicherung. Diese Werkzeuge hatten keine Autorenschaft,
+keine Koautorrolle, keine Danksagungsempfängerrolle, keine Wahrheits- oder
+Ground-Truth-Funktion und keine Rolle als unabhängige Validierungsinstanz.
 Die inhaltliche Konzeption, wissenschaftliche Argumentation, formale
 Modellentwicklung, finalen redaktionellen Entscheidungen und Verantwortung
-f"ur den gesamten Inhalt liegen ausschlie{\ss}lich beim Autor.
+für den gesamten Inhalt liegen ausschließlich beim Autor.
 
 % ================================================================
 \bibliographystyle{apalike}

@@ -80,7 +80,7 @@
 \begin{abstract}
 We present the design and prototype implementation of a functional pathway-centric medical knowledge graph for differential-diagnosis research. Many clinical decision support systems organize knowledge around diagnoses, symptoms, or genes as primary entities. In contrast, the proposed system uses \emph{biological functional pathways} as its central organizing principle, linking genes, proteins, laboratory values, anatomical locations, cell types, and clinical diagnoses as secondary annotations.
 
-This architecture supports a specific form of \emph{exclusion reasoning}: if a functional pathway is judged sufficiently intact on the basis of laboratory markers, genes required for that pathway can be deprioritized as primary disease causes in the current patient, subject to redundancy, pleiotropy, and measurement-quality constraints. The system is implemented as a SQLite-backed prototype with a PySide6 graphical interface and integrates public data sources (Reactome, Gene Ontology, UniProt, HGNC, Uberon, Cell Ontology).
+This architecture supports a specific form of \emph{exclusion reasoning}: if a functional pathway is judged sufficiently intact on the basis of laboratory markers, genes required for that pathway can be deprioritized as primary explanations for the current presentation, subject to redundancy, pleiotropy, and measurement-quality constraints. The system is implemented as a SQLite-backed prototype with a PySide6 graphical interface and integrates public data sources (Reactome, Gene Ontology, UniProt, HGNC, Uberon, Cell Ontology).
 
 We describe the formal exclusion model---in both binary and probabilistic variants---together with its assumptions, limitations, and validation requirements. The prototype is demonstrated on a hemolysis--immunodeficiency scenario involving five functional pathways, eleven genes, and seven laboratory markers. The system is positioned as a research tool for exploring pathway-centric exclusion logic, not as a validated clinical decision support system.
 \end{abstract}
@@ -98,14 +98,14 @@ Differential diagnosis in complex, multi-system diseases often fails not only be
 The central observation motivating this work is:
 
 \begin{quote}
-\emph{If a biological functional pathway is sufficiently supported as intact, then genes whose pathogenic effect would be expected to disrupt that pathway can be deprioritized as primary causes of dysfunction.}
+\emph{If a biological functional pathway is sufficiently supported as intact, then genes whose pathogenic effect would be expected to disrupt that pathway can be deprioritized as primary explanations for the current presentation.}
 \end{quote}
 
 This transforms positive evidence (apparently intact pathway function) into negative diagnostic constraints (lower-priority candidate genes), potentially reducing the candidate space before more detailed differential-diagnostic review begins.
 
 Existing systems organize knowledge differently. PhenoTips \citep{Girdea2013} and Phenomizer \citep{Kohler2009} match patient phenotypes to disease databases via the Human Phenotype Ontology \citep{Robinson2008}. These systems excel at symptom-to-disease matching but do not exploit pathway integrity as exclusion evidence. Pathway databases such as Reactome \citep{Fabregat2018} and KEGG \citep{Kanehisa2023} organize around biochemical reactions but are not designed for clinical exclusion reasoning. Gene Ontology \citep{Ashburner2000} provides fine-grained process descriptions but lacks the clinical decision framework.
 
-The proposed system addresses this gap by treating functional pathways as \emph{first-class entities} in a knowledge graph, with all other biomedical concepts---genes, anatomical locations, cell types, laboratory markers, and diagnoses---attached as secondary annotations. This structural choice makes pathway-status reasoning explicit and computationally tractable while preserving a biologically interpretable intermediate layer.
+The proposed system addresses this gap by treating functional pathways as \emph{primary anchor entities} in a knowledge graph, with all other biomedical concepts---genes, anatomical locations, cell types, laboratory markers, and diagnoses---attached as secondary annotations. This structural choice makes pathway-status reasoning explicit and computationally tractable while preserving a biologically interpretable intermediate layer.
 
 \subsection{Contributions}
 
@@ -247,7 +247,7 @@ Gene & BodyLocation & \texttt{EXPRESSED\_IN} \\
 \subsection{Implementation}
 \label{sec:implementation}
 
-The prototype uses \textbf{SQLite} as the backend, using relational and association tables to emulate graph structure (Figure~\ref{fig:schema_sql}). The system comprises four main modules:
+The prototype uses \textbf{SQLite} as its backend, with relational and association tables emulating graph structure (Figure~\ref{fig:schema_sql}). The system comprises four main modules:
 
 \begin{enumerate}
     \item \textbf{Ingestion module}: Downloads and parses six public data sources (Section~\ref{sec:datasources}), with a manifest-based tracking system to avoid redundant downloads.
@@ -498,21 +498,21 @@ The probabilistic exclusion formula (Definition~\ref{def:probabilistic}) assumes
 
 \subsection{Phenotype-Driven Diagnosis Support}
 
-Phenomizer \citep{Kohler2009} and PhenoTips \citep{Girdea2013} represent the state of the art in phenotype-driven diagnosis. Both systems match patient phenotypes (HPO terms) to disease databases and rank candidate diagnoses by semantic similarity. They are effective for symptom-to-disease matching but do not model biological pathways or exploit pathway integrity for exclusion reasoning.
+Phenomizer \citep{Kohler2009} and PhenoTips \citep{Girdea2013} are widely used phenotype-driven diagnosis systems. Both match patient phenotypes (HPO terms) to disease databases and rank candidate diagnoses by semantic similarity. They are effective for symptom-to-disease matching but do not model biological pathways or exploit pathway integrity for exclusion reasoning.
 
 \subsection{Pathway Analysis in Genomics}
 
-Gene Set Enrichment Analysis (GSEA) \citep{Subramanian2005} and related tools identify dysregulated pathways from expression data. These methods operate at the population level and require omics data that are not typically available in routine clinical settings. The proposed system instead works with individual patient laboratory values, making it closer to standard clinical workflows, although clinical applicability remains to be validated.
+Gene Set Enrichment Analysis (GSEA) \citep{Subramanian2005} and related tools identify dysregulated pathways from expression data. These methods operate at the population level and require omics data that are not typically available in routine clinical settings. The proposed system instead works with individual patient laboratory values, making it more compatible with standard clinical workflows, although clinical applicability remains to be validated.
 
 \subsection{Graph-Based Clinical Reasoning}
 
-Knowledge graphs for clinical decision support have been explored in several contexts. Clinical knowledge graphs built from electronic health records \citep{Rotmensch2017} capture statistical associations between diagnoses, laboratory values, and treatments. Large-scale biomedical knowledge graphs such as Hetionet \citep{Himmelstein2017} integrate diverse data sources for drug repurposing and hypothesis generation. However, none of these systems use pathway status as a first-class constraint in exclusion reasoning.
+Knowledge graphs for clinical decision support have been explored in several contexts. Clinical knowledge graphs built from electronic health records \citep{Rotmensch2017} capture statistical associations between diagnoses, laboratory values, and treatments. Large-scale biomedical knowledge graphs such as Hetionet \citep{Himmelstein2017} integrate diverse data sources for drug repurposing and hypothesis generation. However, none of these systems use pathway status as an explicit constraint in exclusion reasoning.
 
 \subsection{LLM-Augmented Biomedical Reasoning}
 
-Recent work combines large language models with biomedical knowledge graphs. ESCARGOT \citep{Matsumoto2025} integrates LLMs with a dynamic ``Graph of Thoughts'' architecture and biomedical knowledge graphs for multihop reasoning tasks. While ESCARGOT demonstrates effective graph-based reasoning in biomedical contexts, it operates as a general-purpose reasoning agent without explicit exclusion logic. The proposed system shares the emphasis on knowledge graph-guided reasoning but differs fundamentally in its organizing principle: functional pathways as first-class diagnostic constraints rather than general-purpose graph traversal.
+Recent work combines large language models with biomedical knowledge graphs. ESCARGOT \citep{Matsumoto2025} integrates LLMs with a dynamic ``Graph of Thoughts'' architecture and biomedical knowledge graphs for multihop reasoning tasks. While ESCARGOT demonstrates effective graph-based reasoning in biomedical contexts, it operates as a general-purpose reasoning agent without explicit exclusion logic. The proposed system shares the emphasis on knowledge graph-guided reasoning but differs in its organizing principle: functional pathways as explicit diagnostic constraints rather than general-purpose graph traversal.
 
-HealthGenie \citep{Gao2025} demonstrates knowledge-driven LLM integration for personalized health guidance. Its approach organizes knowledge graphs around user profiles and dietary recommendations---a symptom-centric (or need-centric) organization. In contrast, the proposed system organizes around biological functional pathways, enabling mechanistic exclusion reasoning that is not available in symptom-centric architectures.
+HealthGenie \citep{Gao2025} demonstrates knowledge-driven LLM integration for personalized health guidance. Its approach organizes knowledge graphs around user profiles and dietary recommendations---a symptom-centric (or need-centric) organization. In contrast, the proposed system organizes around biological functional pathways, enabling a mechanistic form of exclusion reasoning that is not typically explicit in symptom-centric architectures.
 
 \subsection{Comparison Summary}
 
@@ -553,7 +553,7 @@ Target sources include rare disease registries (EURORDIS), OMIM clinical synopsi
 
 \subsection{Evaluation-Gate Ledger}
 
-The evaluation problem is not a single accuracy score. Demonstration data, synthetic stress tests, real patient benchmarks, temporal validity, provenance, and external comparators answer different questions. Table~\ref{tab:evaluation-gates} separates these layers so that a positive result in one layer is not overread as validation in another.
+Evaluation cannot be reduced to a single accuracy score. Demonstration data, synthetic stress tests, real patient benchmarks, temporal validity, provenance, and external comparators answer different questions. Table~\ref{tab:evaluation-gates} separates these layers so that a positive result in one layer is not mistaken for validation in another.
 
 \begin{table}[H]
 \centering
@@ -569,14 +569,14 @@ Synthetic stress tests & Planted causal gene, simulated laboratory perturbation,
 Real-case benchmark & 20--50 confirmed rare-disease cases with pre-diagnosis laboratory profiles & CRR $\geq 0.30$ with false-exclusion rate $=0$ & No autonomous diagnostic claim \\
 Temporal certificate gate & Age window, disease stage, observation time, and validity horizon for each pathway certificate & Hard exclusion is allowed only inside the certificate's valid time window; otherwise review is required & No timeless exclusion rule \\
 Provenance and evidence tier & Source identifier, evidence span, database version, and confidence tier for each pathway-status claim & Each retained or excluded gene is traceable to explicit source evidence & No source-free graph inference \\
-Comparator suite & Same case set evaluated with HPO/Phenomizer and reproducible rare-disease KG or embedding baselines & Added value over HPO-only filtering and current baseline systems is visible & No isolated benchmark claim \\
+Comparator suite & Same case set evaluated with HPO/Phenomizer and reproducible rare-disease KG or embedding baselines & Added value beyond HPO-only filtering and current baseline systems is demonstrable & No isolated benchmark claim \\
 \bottomrule
 \end{tabularx}
 \end{table}
 
 \subsection{Primary Metric}
 
-The candidate reduction rate (CRR, Equation~\eqref{eq:crr}) serves as the primary success criterion. A CRR $> 0.30$ supports the core hypothesis; a CRR $< 0.10$ would indicate insufficient diagnostic value.
+The candidate reduction rate (CRR, Equation~\eqref{eq:crr}) is used here as the primary success criterion. A CRR $> 0.30$ supports the core hypothesis; a CRR $< 0.10$ would indicate insufficient diagnostic value.
 
 \textbf{Safety constraint}: The confirmed causal gene must \emph{never} be excluded (false exclusion rate = 0). Any false exclusion in the benchmark invalidates the model for clinical application.
 
@@ -596,7 +596,7 @@ An alternative validation pathway addresses the scarcity of annotated real-world
 \section{Discussion}
 \label{sec:discussion}
 
-The pathway-centric approach addresses a structural gap in current clinical decision support: the systematic use of \emph{negative evidence} (what is demonstrably working) to constrain the diagnostic space. This is conceptually analogous to industrial fault diagnosis, where functioning subsystems eliminate entire branches of the fault tree.
+The pathway-centric approach addresses a structural gap in current clinical decision support: the systematic use of \emph{negative evidence} (what can be treated as functionally preserved under stated assumptions) to constrain the diagnostic space. This is conceptually analogous to industrial fault diagnosis, where functioning subsystems eliminate entire branches of the fault tree.
 
 Several design decisions merit discussion:
 
@@ -610,7 +610,7 @@ Several design decisions merit discussion:
 \section{Conclusion and Future Work}
 \label{sec:conclusion}
 
-The functional pathway-centric knowledge graph represents a structurally distinct approach to differential-diagnosis research, using pathway-status evidence as explicit diagnostic constraints. The prototype implementation demonstrates technical feasibility across all core components: data ingestion from six public databases, graph modeling with semantic edge types, binary and probabilistic exclusion reasoning, pattern detection, and interactive visualization.
+The functional pathway-centric knowledge graph represents a structurally distinct approach to differential-diagnosis research, using pathway-status evidence as explicit diagnostic constraints. The prototype implementation establishes prototype-level technical feasibility across the core components: data ingestion from six public databases, graph modeling with semantic edge types, binary and probabilistic exclusion reasoning, pattern detection, and interactive visualization.
 
 The core hypothesis---that pathway exclusion reduces the candidate gene space by $\geq 30\%$ without false exclusions---is testable and constitutes the primary empirical target for future work.
 
