@@ -1,4 +1,4 @@
-# System-Medizin (System Medicine) <!-- last-checked: 2026-06-10 -->
+# System-Medizin (System Medicine) <!-- last-checked: 2026-07-19 -->
 
 [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.19429347.svg)](https://doi.org/10.5281/zenodo.19429347)
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
@@ -17,7 +17,7 @@ A **functional-pathway-centric medical knowledge graph** for rare-disease differ
 | Need | Open |
 |------|------|
 | Understand the research idea | [`WHITEPAPER.md`](WHITEPAPER.md) |
-| Cite the software record | [Zenodo v0.6](https://doi.org/10.5281/zenodo.20101507) / [concept DOI](https://doi.org/10.5281/zenodo.19429347) |
+| Cite the software record | [Zenodo v0.7](https://doi.org/10.5281/zenodo.21311232) / [concept DOI](https://doi.org/10.5281/zenodo.19429347) |
 | Inspect the implementation | [`engine/`](engine/) and [`database.py`](database.py) |
 | Run the prototype | `python main.py`, then load demo data in the setup wizard |
 | Check source health | `python -m compileall -q engine ingestion gui main.py database.py config.py` and `python -m pytest -q` |
@@ -129,7 +129,7 @@ This tool integrates exclusively **public, open-access** biological databases:
 
 The formal exclusion model (binary and probabilistic variants), assumptions, limitations, and validation framework are described in the accompanying concept paper:
 
-> Geiger, L. (2026). *Functional Pathway-Centric Medical Knowledge Graph with Exclusion Logic for Rare Disease Differential Diagnosis.* Zenodo v0.6. https://doi.org/10.5281/zenodo.20101507
+> Geiger, L. (2026). *Functional Pathway-Centric Medical Knowledge Graph with Exclusion Logic for Rare Disease Differential Diagnosis.* Zenodo v0.7. https://doi.org/10.5281/zenodo.21311232
 
 The `paper/` directory contains the English, German, and combined PDF/LaTeX package. `CITATION.cff` contains the recommended citation metadata for GitHub and citation tools.
 

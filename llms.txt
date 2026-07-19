@@ -1,11 +1,11 @@
 # System-Medizin / system-medicine
 
 Canonical repository: https://github.com/um-bruch/system-medicine
-Zenodo version DOI: https://doi.org/10.5281/zenodo.20101507
+Zenodo version DOI: https://doi.org/10.5281/zenodo.21311232
 Zenodo concept DOI: https://doi.org/10.5281/zenodo.19429347
 License: MIT
 Status: research prototype; not a clinical decision support system; not a medical device.
-Last-checked: 2026-06-10
+Last-checked: 2026-07-19
 
 ## What this repository is
 

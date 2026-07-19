@@ -7,11 +7,20 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+No unreleased changes are currently recorded.
+
+## [0.7.0] - 2026-07-11
+
 ### Added
 - Added a GitHub Actions smoke-test workflow for Python 3.10, 3.11, and 3.12.
 - Added in-memory core smoke tests for database schema setup, exclusion logic, probabilistic ranking, and measurement-to-pathway queries.
 - Added Unicode character support configuration (`glyphtounicode`) to English and German LaTeX source papers to fix rendering/copying artifacts in compiled PDFs.
 - Added `CHANGELOG.md` for project history and release tracking.
+
+### Changed
+- Published the June paper-maintenance set as Zenodo v0.7 without a clinical-validation claim.
+- Carried forward the evaluation-gate ledger, AI-disclosure hardening, English register maintenance, and German terminology/umlaut cleanup.
+- Normalized the Zenodo related repository to `https://github.com/um-bruch/system-medicine`.
 
 ## [0.6.0] - 2026-05-10
 

@@ -7,9 +7,9 @@ authors:
     given-names: Lukas
     orcid: "https://orcid.org/0009-0005-7296-1534"
 affiliation: "Independent Researcher, Bernau, Germany"
-version: "0.6"
-date-released: "2026-05-10"
-doi: "10.5281/zenodo.20101507"
+version: "0.7"
+date-released: "2026-07-11"
+doi: "10.5281/zenodo.21311232"
 url: "https://github.com/um-bruch/system-medicine"
 repository-code: "https://github.com/um-bruch/system-medicine"
 license: MIT
