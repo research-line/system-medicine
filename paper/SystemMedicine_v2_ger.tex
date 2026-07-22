@@ -490,7 +490,7 @@ Ein praktischer Einsatz ausschlussbasierter klinischer Entscheidungsunterstützu
 
 \subsection{Messredundanz und Kontextualität}
 
-Die probabilistische Ausschlussformel (Definition~\ref{def:probabilistic}) nimmt an, dass Labormessungen unabhängige Evidenz über den Pathway-Status liefern. Jedoch warnt das Contextuality-by-Default-(CbD-)Framework von Dzhafarov und Kujala \citep{Dzhafarov2016}, dass parallele Messungen informationelle Redundanz statt genuiner Unabhängigkeit aufweisen können. Wenn zwei Laborwerte gleichzeitig abfallen, kann dies eine redundante Messung derselben Pathway-Ausgabe widerspiegeln, anstatt unabhängige Evidenz für eine gemeinsame genetische Ursache (Pleiotropie) darzustellen. Eine rigorose Behandlung würde einen CbD-inspirierten Korrekturterm im Ausschlusswert erfordern, der die Überlappung des Messkontexts berücksichtigt. Diese Verfeinerung ist für zukünftige Versionen des probabilistischen Modells geplant.
+Die probabilistische Ausschlussformel (Definition~\ref{def:probabilistic}) nimmt an, dass Labormessungen unabhängige Evidenz über den Pathway-Status liefern. Jedoch warnt der Contextuality-by-Default-(CbD-)Rahmen von Dzhafarov und Kujala \citep{Dzhafarov2016}, dass parallele Messungen informationelle Redundanz statt genuiner Unabhängigkeit aufweisen können. Wenn zwei Laborwerte gleichzeitig abfallen, kann dies eine redundante Messung derselben Pathway-Ausgabe widerspiegeln, anstatt unabhängige Evidenz für eine gemeinsame genetische Ursache (Pleiotropie) darzustellen. Eine rigorose Behandlung würde einen CbD-inspirierten Korrekturterm im Ausschlusswert erfordern, der die Überlappung des Messkontexts berücksichtigt. Diese Verfeinerung ist für zukünftige Versionen des probabilistischen Modells geplant.
 
 % ================================================================
 \section{Verwandte Arbeiten}
@@ -551,25 +551,25 @@ Eine rigorose Validierung erfordert einen kuratierten Benchmark von 20--50 best�
 
 Zielquellen umfassen Register für seltene Erkrankungen (EURORDIS), klinische Synopsen aus OMIM und publizierte Fallserien mit umfassenden Laboruntersuchungen.
 
-\subsection{Evaluations-Gate-Ledger}
+\subsection{Evaluations-Prüfmatrix}
 
 Das Evaluationsproblem ist kein einzelner Genauigkeitswert. Demonstrationsdaten, synthetische Stresstests, Realfall-Benchmarks, zeitliche Gültigkeit, Provenienz und externe Vergleichssysteme beantworten unterschiedliche Fragen. Tabelle~\ref{tab:evaluation-gates} trennt diese Ebenen, damit ein positives Ergebnis in einer Schicht nicht als Validierung einer anderen Schicht überlesen wird.
 
 \begin{table}[H]
 \centering
-\caption{Evaluationsgates für die Validierung von Pathway-Zertifikaten.}
+\caption{Evaluations-Prüfmatrix für die Validierung von Pathway-Zertifikaten.}
 \label{tab:evaluation-gates}
 \scriptsize
 \begin{tabularx}{\textwidth}{@{}YYYY@{}}
 \toprule
-\textbf{Gate} & \textbf{Minimales Datenobjekt} & \textbf{Pass-/Hold-Regel} & \textbf{Verhinderter Überclaim} \\
+\textbf{Prüfkriterium} & \textbf{Minimales Datenobjekt} & \textbf{Bestehensregel} & \textbf{Verhinderte Überinterpretation} \\
 \midrule
-Demonstrations-Seed & Kuratierter Hämolyse-Immundefizienz-Teilgraph mit manuell gesetzten Pathway-Statuswerten & Erwartete Kandidatenreduktionslogik wird reproduziert und plausible Krankheitsgene bleiben erhalten & Keine Schätzung klinischer Leistungsfähigkeit \\
+Demonstrationsfall & Kuratierter Hämolyse-Immundefizienz-Teilgraph mit manuell gesetzten Pathway-Statuswerten & Erwartete Kandidatenreduktionslogik wird reproduziert und plausible Krankheitsgene bleiben erhalten & Keine Schätzung klinischer Leistungsfähigkeit \\
 Synthetische Stresstests & Eingepflanztes ursächliches Gen, simulierte Laborstörung und bekannte interne Grundwahrheit & Das ursächliche Gen wird nie ausgeschlossen; nicht-ursächliche Gene werden nur bei tragender Pathway-Logik zurückgestuft & Kein Ersatz für Realfallvalidierung \\
 Realfall-Benchmark & 20--50 bestätigte seltene Erkrankungsfälle mit Laborprofilen vor der genetischen Diagnose & CRR $\geq 0{,}30$ bei Falschausschlussrate $=0$ & Kein autonomer Diagnoseclaim \\
-Temporales Zertifikatsgate & Altersfenster, Krankheitsstadium, Beobachtungszeitpunkt und Gültigkeitshorizont je Pathway-Zertifikat & Harter Ausschluss ist nur im gültigen Zeitfenster erlaubt; sonst ist Review erforderlich & Keine zeitlose Ausschlussregel \\
-Provenienz und Evidenzstufe & Quellenkennung, Evidenzspanne, Datenbankversion und Konfidenzstufe je Pathway-Statusclaim & Jedes beibehaltene oder ausgeschlossene Gen ist auf explizite Quellevidenz rückführbar & Keine quellenfreie Graphinferenz \\
-Comparator Suite & Derselbe Fallsatz für HPO/Phenomizer und reproduzierbare Rare-Disease-KG- oder Embedding-Baselines & Zusatznutzen gegenüber HPO-only-Filterung und aktuellen Baselines wird sichtbar & Kein isolierter Benchmarkclaim \\
+Temporales Zertifikatskriterium & Altersfenster, Krankheitsstadium, Beobachtungszeitpunkt und Gültigkeitshorizont je Pathway-Zertifikat & Harter Ausschluss ist nur im gültigen Zeitfenster erlaubt; sonst ist eine Nachprüfung erforderlich & Keine zeitlose Ausschlussregel \\
+Provenienz und Evidenzstufe & Quellenkennung, Evidenzspanne, Datenbankversion und Konfidenzstufe je Pathway-Statusaussage & Jedes beibehaltene oder ausgeschlossene Gen ist auf explizite Quellevidenz rückführbar & Keine quellenfreie Graphinferenz \\
+Vergleichssuite & Derselbe Fallsatz für HPO/Phenomizer und reproduzierbare Rare-Disease-KG- oder Embedding-Baselines & Zusatznutzen gegenüber rein HPO-basierter Filterung und aktuellen Vergleichssystemen wird sichtbar & Kein isolierter Benchmark-Claim \\
 \bottomrule
 \end{tabularx}
 \end{table}
@@ -589,7 +589,7 @@ Ein alternativer Validierungsweg trägt dem Mangel an annotierten realen Datens�
 \begin{itemize}
     \item \textbf{Rangverbesserung}: Position des korrekten Gens in der ranggeordneten Kandidatenliste nach Ausschlussfilterung.
     \item \textbf{Abdeckung}: Prozentsatz der Benchmark-Fälle, bei denen mindestens ein Pathway anhand verfügbarer Labordaten bewertet werden kann.
-    \item \textbf{Vergleich}: CRR gegenüber standardmäßiger HPO-only-Filterung auf dem gleichen Fallsatz.
+    \item \textbf{Vergleich}: CRR gegenüber standardmäßiger rein HPO-basierter Filterung auf dem gleichen Fallsatz.
 \end{itemize}
 
 % ================================================================
@@ -598,7 +598,7 @@ Ein alternativer Validierungsweg trägt dem Mangel an annotierten realen Datens�
 
 Der Pathway-zentrierte Ansatz adressiert eine strukturelle Lücke in der aktuellen klinischen Entscheidungsunterstützung: die systematische Nutzung \emph{negativer Evidenz} (was nachweislich funktioniert), um den diagnostischen Raum einzuschränken. Dies ist konzeptionell analog zur industriellen Fehlerdiagnose, bei der funktionierende Subsysteme ganze Äste des Fehlerbaums eliminieren.
 
-Mehrere Designentscheidungen verdienen Diskussion:
+Mehrere Gestaltungsentscheidungen verdienen Diskussion:
 
 \paragraph{Warum Pathways als Zentrum, nicht Gene oder Diagnosen?} Gene sind Ursachen; Diagnosen sind Folgen. Keines von beiden bietet die mechanistische Zwischenschicht, die für ausschlussbasiertes Schließen benötigt wird. Pathways repräsentieren die funktionellen Einheiten, die genetische Ursachen mit klinischen Auswirkungen verbinden, und sind damit der natürliche Drehpunkt für sowohl Einschluss- als auch Ausschlusslogik.
 
@@ -628,7 +628,7 @@ Die Kernhypothese -- dass Pathway-Ausschluss den Kandidatengenraum um $\geq 30\,
 % ================================================================
 \section*{Daten- und Softwareverfügbarkeit}
 
-Der Quellcode des Prototyps, einschließlich Datenbankschema, Aufnahmepipelines, Ausschluss-Engines und GUI-Anwendung, ist im \href{https://github.com/um-bruch/system-medicine}{öffentlichen GitHub-Repository} verfügbar. Das System integriert ausschließlich öffentliche Datenquellen; es werden keine Patientendaten verwendet oder benötigt.
+Der Quellcode des Prototyps, einschließlich Datenbankschema, Aufnahmepipelines, Ausschlussmodulen und grafischer Oberfläche, ist im \href{https://github.com/um-bruch/system-medicine}{öffentlichen GitHub-Repository} verfügbar. Das System integriert ausschließlich öffentliche Datenquellen; es werden keine Patientendaten verwendet oder benötigt.
 
 % ================================================================
 \section*{KI-Nutzungserklärung}
