@@ -7,7 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
-No unreleased changes are currently recorded.
+### Added
+- Added PEP 621 `pyproject.toml` specification with Pytest configuration (`pythonpath = "."`) for direct test suite discovery.
+
+### Changed
+- Refreshed `llms.txt` and `README.md` Last-checked metadata timestamp (2026-07-25).
 
 ## [0.7.0] - 2026-07-11
 
