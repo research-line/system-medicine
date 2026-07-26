@@ -5,7 +5,7 @@ Zenodo version DOI: https://doi.org/10.5281/zenodo.21311232
 Zenodo concept DOI: https://doi.org/10.5281/zenodo.19429347
 License: MIT
 Status: research prototype; not a clinical decision support system; not a medical device.
-Last-checked: 2026-07-25
+Last-checked: 2026-07-26
 
 ## What this repository is
 
@@ -19,7 +19,8 @@ This repository is not validated for clinical use. It must not be used for diagn
 
 ## Important paths
 
-- `README.md`: public project overview and setup.
+- `README.md`: public project overview (English).
+- `README_de.md`: German translation of project overview.
 - `WHITEPAPER.md`: high-level method summary.
 - `paper/`: English/German PDF and LaTeX paper package.
 - `engine/exclusion.py`: binary and probabilistic pathway exclusion logic.

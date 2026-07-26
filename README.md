@@ -1,12 +1,16 @@
-# System-Medizin (System Medicine) <!-- last-checked: 2026-07-25 -->
+# System-Medizin (System Medicine) <!-- last-checked: 2026-07-26 -->
 
-[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.19429347.svg)](https://doi.org/10.5281/zenodo.19429347)
+[![DOI](https://doi.org/10.5281/zenodo.19429347.svg)](https://doi.org/10.5281/zenodo.19429347)
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 [![Python 3.10+](https://img.shields.io/badge/Python-3.10%2B-blue.svg)](https://www.python.org/)
 [![PySide6](https://img.shields.io/badge/GUI-PySide6-green.svg)](https://doc.qt.io/qtforpython/)
 [![System Medicine smoke tests](https://github.com/um-bruch/system-medicine/actions/workflows/tests.yml/badge.svg)](https://github.com/um-bruch/system-medicine/actions/workflows/tests.yml)
+[![German README](https://img.shields.io/badge/README-Deutsch-de.svg)](README_de.md)
 
 A **functional-pathway-centric medical knowledge graph** for rare-disease differential-diagnosis research, pathway exclusion logic, and auditable biomedical graph reasoning.
+
+> [!NOTE]
+> **LLM & AI Agent Context:** This repository contains a functional-pathway-centric medical knowledge graph prototype. Architectural details, graph exclusion algorithms, and dataset scope are documented in [`llms.txt`](llms.txt) and [`WHITEPAPER.md`](WHITEPAPER.md).
 
 > **Research tool only.** This is not a clinical decision support system, not a medical device, and must not be used for diagnosis, treatment, triage, or any other medical decision.
 
@@ -73,6 +77,22 @@ On Windows you can also double-click `START.bat`.
 On first launch a **Setup Wizard** appears. Click "Load Demo Data" to populate all data panels (hemolysis scenario, clinical lab panels, extended systems).
 
 ## Architecture
+
+```mermaid
+graph TD
+    A["Entry Point (main.py)"] --> B["PySide6 GUI (gui/)"]
+    B --> C["Graph Explorer (graph_view.py)"]
+    B --> D["Exclusion Analysis (exclusion_panel.py)"]
+    B --> E["Diagnostic Query (data_panel.py)"]
+
+    C & D & E --> F["Reasoning & Query Engine (engine/)"]
+    F --> F1["Exclusion Logic (exclusion.py)"]
+    F --> F2["Graph Traversal (query.py)"]
+    F --> F3["Explanations (reasoning.py)"]
+
+    F1 & F2 & F3 --> G["SQLite Database Layer (database.py)"]
+    H["Public Data Ingestion (ingestion/)"] -->|Reactome, GO, UniProt, HGNC, Uberon, Cell Ontology| G
+```
 
 ```text
 system-medicine/

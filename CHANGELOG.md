@@ -7,11 +7,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.7.1] - 2026-07-26
+
 ### Added
+- Added German README documentation (`README_de.md`) and badge link in `README.md`.
+- Added GFM LLM callout box (`> [!NOTE]`) to `README.md` and `README_de.md` for AI/LLM discovery.
+- Added visual Mermaid architecture flowchart diagram to `README.md` and `README_de.md`.
 - Added PEP 621 `pyproject.toml` specification with Pytest configuration (`pythonpath = "."`) for direct test suite discovery.
 
 ### Changed
-- Refreshed `llms.txt` and `README.md` Last-checked metadata timestamp (2026-07-25).
+- Updated `llms.txt` and `README.md` Last-checked metadata timestamp (2026-07-26).
 
 ## [0.7.0] - 2026-07-11
 
