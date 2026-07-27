@@ -1,4 +1,4 @@
-# System-Medizin (System Medicine) <!-- last-checked: 2026-07-26 -->
+# System-Medizin (System Medicine) <!-- last-checked: 2026-07-27 -->
 
 [![DOI](https://doi.org/10.5281/zenodo.19429347.svg)](https://doi.org/10.5281/zenodo.19429347)
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)

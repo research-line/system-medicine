@@ -7,6 +7,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.7.2] - 2026-07-27
+
+### Changed
+- Aligned `pyproject.toml` project version to `0.7.2`.
+- Updated LLM indexing timestamps (`2026-07-27`) in `README.md`, `README_de.md`, and `llms.txt`.
+- Verified core test suite (3/3 passed) and Python bytecode compilation cleanly.
+
 ## [0.7.1] - 2026-07-26
 
 ### Added
