@@ -80,7 +80,7 @@
 \begin{abstract}
 We present the design and prototype implementation of a functional pathway-centric medical knowledge graph for differential-diagnosis research. Many clinical decision support systems organize knowledge around diagnoses, symptoms, or genes as primary entities. In contrast, the proposed system uses \emph{biological functional pathways} as its central organizing principle, linking genes, proteins, laboratory values, anatomical locations, cell types, and clinical diagnoses as secondary annotations.
 
-This architecture supports a specific form of \emph{exclusion reasoning}: if a functional pathway is judged sufficiently intact on the basis of laboratory markers, genes required for that pathway can be deprioritized as primary explanations for the current presentation, subject to redundancy, pleiotropy, and measurement-quality constraints. The system is implemented as a SQLite-backed prototype with a PySide6 graphical interface and integrates public data sources (Reactome, Gene Ontology, UniProt, HGNC, Uberon, Cell Ontology).
+This architecture supports a specific form of \emph{exclusion reasoning}: if a functional pathway is supported as sufficiently intact by laboratory markers, genes required for that pathway can be deprioritized as primary explanations for the current presentation, subject to redundancy, pleiotropy, and measurement-quality constraints. The system is implemented as a SQLite-backed prototype with a PySide6 graphical interface and integrates public data sources (Reactome, Gene Ontology, UniProt, HGNC, Uberon, Cell Ontology).
 
 We describe the formal exclusion model---in both binary and probabilistic variants---together with its assumptions, limitations, and validation requirements. The prototype is demonstrated on a hemolysis--immunodeficiency scenario involving five functional pathways, eleven genes, and seven laboratory markers. The system is positioned as a research tool for exploring pathway-centric exclusion logic, not as a validated clinical decision support system.
 \end{abstract}
@@ -101,7 +101,7 @@ The central observation motivating this work is:
 \emph{If a biological functional pathway is sufficiently supported as intact, then genes whose pathogenic effect would be expected to disrupt that pathway can be deprioritized as primary explanations for the current presentation.}
 \end{quote}
 
-This transforms positive evidence (apparently intact pathway function) into negative diagnostic constraints (lower-priority candidate genes), potentially reducing the candidate space before more detailed differential-diagnostic review begins.
+This transforms positive evidence (apparently preserved pathway function) into negative diagnostic constraints (lower-priority candidate genes), potentially reducing the candidate space before more detailed differential-diagnostic review begins.
 
 Existing systems organize knowledge differently. PhenoTips \citep{Girdea2013} and Phenomizer \citep{Kohler2009} match patient phenotypes to disease databases via the Human Phenotype Ontology \citep{Robinson2008}. These systems excel at symptom-to-disease matching but do not exploit pathway integrity as exclusion evidence. Pathway databases such as Reactome \citep{Fabregat2018} and KEGG \citep{Kanehisa2023} organize around biochemical reactions but are not designed for clinical exclusion reasoning. Gene Ontology \citep{Ashburner2000} provides fine-grained process descriptions but lacks the clinical decision framework.
 
@@ -486,7 +486,7 @@ Not all pathways have adequate Reactome coverage. Orphan pathways, tissue-specif
 
 \subsection{EHR Interoperability}
 
-A practical deployment of exclusion-based clinical decision support requires integration with electronic health record (EHR) systems to obtain structured patient laboratory data. Without interoperable access to real-time laboratory values via standards such as HL7 FHIR \citep{HL7FHIR2023}, the system remains limited to manually entered measurements. EHR interoperability is a well-documented challenge in clinical informatics; addressing it is beyond the scope of this concept paper but constitutes a critical requirement for any future clinical application.
+A practical deployment of exclusion-based clinical decision support would require integration with electronic health record (EHR) systems to obtain structured patient laboratory data. Without interoperable access to real-time laboratory values via standards such as HL7 FHIR \citep{HL7FHIR2023}, the system remains limited to manually entered measurements. EHR interoperability is a well-documented challenge in clinical informatics; addressing it is beyond the scope of this concept paper but remains a critical requirement for any future clinical application.
 
 \subsection{Measurement Redundancy and Contextuality}
 
@@ -502,7 +502,7 @@ Phenomizer \citep{Kohler2009} and PhenoTips \citep{Girdea2013} are widely used p
 
 \subsection{Pathway Analysis in Genomics}
 
-Gene Set Enrichment Analysis (GSEA) \citep{Subramanian2005} and related tools identify dysregulated pathways from expression data. These methods operate at the population level and require omics data that are not typically available in routine clinical settings. The proposed system instead works with individual patient laboratory values, making it more compatible with standard clinical workflows, although clinical applicability remains to be validated.
+Gene Set Enrichment Analysis (GSEA) \citep{Subramanian2005} and related tools identify dysregulated pathways from expression data. These methods operate at the population level and require omics data that are not typically available in routine clinical settings. The proposed system instead uses individual patient laboratory values, making it more compatible with standard clinical workflows, although clinical applicability remains to be validated.
 
 \subsection{Graph-Based Clinical Reasoning}
 
@@ -510,7 +510,7 @@ Knowledge graphs for clinical decision support have been explored in several con
 
 \subsection{LLM-Augmented Biomedical Reasoning}
 
-Recent work combines large language models with biomedical knowledge graphs. ESCARGOT \citep{Matsumoto2025} integrates LLMs with a dynamic ``Graph of Thoughts'' architecture and biomedical knowledge graphs for multihop reasoning tasks. While ESCARGOT demonstrates effective graph-based reasoning in biomedical contexts, it operates as a general-purpose reasoning agent without explicit exclusion logic. The proposed system shares the emphasis on knowledge graph-guided reasoning but differs in its organizing principle: functional pathways as explicit diagnostic constraints rather than general-purpose graph traversal.
+Recent work combines large language models with biomedical knowledge graphs. ESCARGOT \citep{Matsumoto2025} integrates LLMs with a dynamic ``Graph of Thoughts'' architecture and biomedical knowledge graphs for multihop reasoning tasks. While ESCARGOT reports effective graph-based reasoning in biomedical contexts, it operates as a general-purpose reasoning agent without explicit exclusion logic. The proposed system shares the emphasis on knowledge graph-guided reasoning but differs in its organizing principle: functional pathways as explicit diagnostic constraints rather than general-purpose graph traversal.
 
 HealthGenie \citep{Gao2025} demonstrates knowledge-driven LLM integration for personalized health guidance. Its approach organizes knowledge graphs around user profiles and dietary recommendations---a symptom-centric (or need-centric) organization. In contrast, the proposed system organizes around biological functional pathways, enabling a mechanistic form of exclusion reasoning that is not typically explicit in symptom-centric architectures.
 
@@ -610,7 +610,7 @@ Several design decisions merit discussion:
 \section{Conclusion and Future Work}
 \label{sec:conclusion}
 
-The functional pathway-centric knowledge graph represents a structurally distinct approach to differential-diagnosis research, using pathway-status evidence as explicit diagnostic constraints. The prototype implementation establishes prototype-level technical feasibility across the core components: data ingestion from six public databases, graph modeling with semantic edge types, binary and probabilistic exclusion reasoning, pattern detection, and interactive visualization.
+The functional pathway-centric knowledge graph represents a structurally distinct approach to differential-diagnosis research, using pathway-status evidence as explicit diagnostic constraints. The prototype implementation demonstrates prototype-level technical feasibility across the core components: data ingestion from six public databases, graph modeling with semantic edge types, binary and probabilistic exclusion reasoning, pattern detection, and interactive visualization.
 
 The core hypothesis---that pathway exclusion reduces the candidate gene space by $\geq 30\%$ without false exclusions---is testable and constitutes the primary empirical target for future work.
 
@@ -633,7 +633,7 @@ The prototype source code, including database schema, ingestion pipelines, exclu
 % ================================================================
 \section*{AI Disclosure}
 
-AI-assisted tools (Claude/Anthropic and GPT/Codex) were used as non-authorial support tools during preparation of this manuscript, particularly for literature organization, code development support, text structuring, translation assistance, consistency checks, and LaTeX/PDF quality assurance. These tools did not serve as authors, co-authors, acknowledgement recipients, ground-truth sources, or independent validation authorities. The conceptual design, scientific argumentation, formal model development, final editorial decisions, and responsibility for all content lie exclusively with the author.
+Generative AI tools were used as non-authorial support tools during preparation of this manuscript, particularly for literature organization, code development support, text structuring, translation assistance, consistency checks, and LaTeX/PDF quality assurance. These tools did not serve as authors, co-authors, acknowledgement recipients, ground-truth sources, or independent validation authorities. The conceptual design, scientific argumentation, formal model development, final editorial decisions, and responsibility for all content lie exclusively with the author.
 
 % ================================================================
 \bibliographystyle{apalike}
